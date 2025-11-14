@@ -1,6 +1,6 @@
-#include "pch.h"
-#include "Spherical.h"
-#include "drawing.h"
+#include "../include/pch.h"
+#include "../include/Spherical.h"
+#include "../include/drawing.h"
 
 using sfe = sf::Event;
 using sfk = sf::Keyboard;

@@ -1,5 +1,5 @@
-#include "pch.h"
-#include "drawing.h"
+#include "../include/pch.h"
+#include "../include/drawing.h"
 
 namespace Drawing {
     Spherical camera(3.0f, 1.0f, 0.2f);
