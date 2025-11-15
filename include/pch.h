@@ -16,5 +16,8 @@
 #include <iostream>
 #include <algorithm>
 #include <numbers>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 #endif //PCH_H
