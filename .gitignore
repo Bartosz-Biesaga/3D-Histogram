@@ -6,9 +6,7 @@
 *.config
 *.vcxproj*
 *.sln
-imgui/*
-*.ini
-
+tinyfiledialogs.*
 
 # User-specific files
 *.rsuser
