@@ -19,6 +19,20 @@ int main() {
 	sf::Vector2i mouseLastPosition{ 0, 0 };
 	bool mouseLastPositionInitialized = false;
     bool willSaveScreen = false;
+    std::ifstream userGuideFile("user_guide.txt");
+    std::string userGuideContent = "Missing user_guide.txt file!";
+    if (userGuideFile.is_open()) {
+        std::stringstream buffer;
+        buffer << userGuideFile.rdbuf();
+        userGuideContent = buffer.str();
+    }
+    tinyfd_messageBox(
+        "User Guide",
+        userGuideContent.c_str(),
+        "OK",
+        "info",
+        1
+    );
 
     while (running) {
         while (window.pollEvent(event)) {

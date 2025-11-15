@@ -1,0 +1,8 @@
+* How to control camera:
+  - move your mouse while holding <left mouse button> to rotate around histogram,
+  - use <mouse scroll> to zoom in/out,
+  - hold <left alt> or <left control> while rotating/zooming to perform them with higher precision,
+  - press <P> to switch between perspective/orthogonal projection.
+
+* Misc:
+  - press <left control> + <S> to save a screenshot.
