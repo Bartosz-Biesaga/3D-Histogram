@@ -18,7 +18,8 @@ namespace Drawing {
             gluPerspective(45., (GLdouble)size.x / (GLdouble)size.y, 0.1, 100.0);
         }
         else {
-            glOrtho(-1.245 * ((GLdouble)size.x / (GLdouble)size.y), 1.245 * ((GLdouble)size.x / (GLdouble)size.y), -1.245, 1.245, -3.0, 12.0);
+            float magic_number = camera.distance / 2.2;
+            glOrtho(-magic_number * ((GLdouble)size.x / (GLdouble)size.y), magic_number * ((GLdouble)size.x / (GLdouble)size.y), -magic_number, magic_number, -3., 12.0);
         }
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
