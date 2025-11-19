@@ -1,7 +1,7 @@
 #include "../include/pch.h"
 #include "../include/Histogram3D.h"
 
- std::vector<std::string> Histogram3D::getNextLineAndSplitIntoTokens(std::istream& istream, char delimiter) {
+std::vector<std::string> Histogram3D::getNextLineAndSplitIntoTokens(std::istream& istream, char delimiter) {
      std::vector<std::string> result;
      std::string line;
      std::getline(istream, line);
@@ -16,64 +16,128 @@
      return result;
  }
 
- int Histogram3D::getColumnNumberByName(std::vector<std::string> tokens, std::string const& columnName) {
-     for(int columnNumber = 0; columnNumber < tokens.size(); ++columnNumber) {
-         if (tokens[columnNumber] == columnName) {
-             return columnNumber;
-         }
-     }
-	 throw std::runtime_error("Column name not found: " + columnName);
- }
+int Histogram3D::getColumnNumberByName(std::vector<std::string> tokens, std::string const& columnName) {
+    for (int columnNumber = 0; columnNumber < tokens.size(); ++columnNumber) {
+        if (tokens[columnNumber] == columnName) {
+            return columnNumber;
+        }
+    }
+    throw std::runtime_error("Column name not found: " + columnName);
+}
 
- std::vector<std::tuple<double, double, bool>> Histogram3D::loadData(std::string const& csvPath, char delimiter,
-        int column1Number, int column2Number, int boolColumnNumber, bool skipFirstRow) {
-     std::vector<std::tuple<double, double, bool>> result;
-	 std::ifstream file(csvPath);
-     if (!file.is_open()) {
-         throw std::runtime_error("Could not open file: " + csvPath);
-	 }
-     if (skipFirstRow) {
-         Histogram3D::getNextLineAndSplitIntoTokens(file, delimiter);
-	 }
-     std::vector<std::string> tokens;
-	 int rowCounter = 0;
-     while (file) {
-         tokens = Histogram3D::getNextLineAndSplitIntoTokens(file, delimiter);
-         if (tokens.size() == 0) {
-             break;
-         }
-         if (tokens.size() <= std::max({ column1Number, column2Number, boolColumnNumber })) {
-             throw std::runtime_error("Not enought values in row " + std::to_string(rowCounter) + 
-                 ". Found " + std::to_string(tokens.size()) + ", needed " +
-                 std::to_string(std::max({ column1Number, column2Number, boolColumnNumber }) + 1));
-         }
-         double value1, value2;
-         try {
-             value1 = std::stod(tokens[column1Number]);
-             value2 = std::stod(tokens[column2Number]);
-         }
-         catch (std::invalid_argument e) {
-             throw std::runtime_error("Value in row " + std::to_string(rowCounter) +
-                 " can not be converted to float");
-         }
-         bool boolValue = (tokens[boolColumnNumber] == "1" || tokens[boolColumnNumber] == "true" ||
-             tokens[boolColumnNumber] == "True");
-         result.emplace_back(value1, value2, boolValue);
-         ++rowCounter;
-     }
-	 return result;
- }
+std::vector<std::tuple<double, double, bool>> Histogram3D::loadData(std::string const& csvPath, char delimiter,
+    int column1Number, int column2Number, int boolColumnNumber, bool skipFirstRow) {
+    std::vector<std::tuple<double, double, bool>> result;
+    std::ifstream file(csvPath);
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open file: " + csvPath);
+    }
+    if (skipFirstRow) {
+        Histogram3D::getNextLineAndSplitIntoTokens(file, delimiter);
+    }
+    std::vector<std::string> tokens;
+    int rowCounter = 0;
+    while (file) {
+        tokens = Histogram3D::getNextLineAndSplitIntoTokens(file, delimiter);
+        if (tokens.size() == 0) {
+            break;
+        }
+        if (tokens.size() <= std::max({ column1Number, column2Number, boolColumnNumber })) {
+            throw std::runtime_error("Not enought values in row " + std::to_string(rowCounter) +
+                ". Found " + std::to_string(tokens.size()) + ", needed " +
+                std::to_string(std::max({ column1Number, column2Number, boolColumnNumber }) + 1));
+        }
+        double value1, value2;
+        try {
+            value1 = std::stod(tokens[column1Number]);
+            value2 = std::stod(tokens[column2Number]);
+        }
+        catch (std::invalid_argument e) {
+            throw std::runtime_error("Value in row " + std::to_string(rowCounter) +
+                " can not be converted to float");
+        }
+        bool boolValue = (tokens[boolColumnNumber] == "1" || tokens[boolColumnNumber] == "true" ||
+            tokens[boolColumnNumber] == "True");
+        result.emplace_back(value1, value2, boolValue);
+        ++rowCounter;
+    }
+    return result;
+}
 
- std::vector<std::tuple<double, double, bool>> Histogram3D::loadData(std::string const& csvPath, char delimiter,
-        std::string const& column1Name, std::string const& column2Name, std::string const& boolColumnName) {
-     std::ifstream file(csvPath);
-     if (!file.is_open()) {
-         throw std::runtime_error("Could not open file: " + csvPath);
-     }
-     auto tokens = Histogram3D::getNextLineAndSplitIntoTokens(file, delimiter);
-	 int column1Number = Histogram3D::getColumnNumberByName(tokens, column1Name);
-	 int column2Number = Histogram3D::getColumnNumberByName(tokens, column2Name);
-	 int boolColumnNumber = Histogram3D::getColumnNumberByName(tokens, boolColumnName);
-     return Histogram3D::loadData(csvPath, delimiter,
-		 column1Number, column2Number, boolColumnNumber, true);
- }
+std::vector<std::tuple<double, double, bool>> Histogram3D::loadData(std::string const& csvPath, char delimiter,
+    std::string const& column1Name, std::string const& column2Name, std::string const& boolColumnName) {
+    std::ifstream file(csvPath);
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open file: " + csvPath);
+    }
+    auto tokens = Histogram3D::getNextLineAndSplitIntoTokens(file, delimiter);
+    int column1Number = Histogram3D::getColumnNumberByName(tokens, column1Name);
+    int column2Number = Histogram3D::getColumnNumberByName(tokens, column2Name);
+    int boolColumnNumber = Histogram3D::getColumnNumberByName(tokens, boolColumnName);
+    return Histogram3D::loadData(csvPath, delimiter,
+        column1Number, column2Number, boolColumnNumber, true);
+}
+
+Histogram3D::Histogram3D(int binsNumberAlongColumn1, int binsNumberAlongColumn2, std::vector<std::tuple<double, double, bool>>& data) {
+	double minValue1, maxValue1, minValue2, maxValue2;
+    auto minMaxValue1IteratorPair = std::minmax_element(data.begin(), data.end(),
+        [](std::tuple<double, double, bool> const& t1, std::tuple<double, double, bool> const& t2) { return std::get<0>(t1) < std::get<0>(t2); });
+    minValue1 = std::get<0>(*std::get<0>(minMaxValue1IteratorPair));
+    maxValue1 = std::get<0>(*std::get<1>(minMaxValue1IteratorPair));
+    auto minMaxValue2IteratorPair = std::minmax_element(data.begin(), data.end(),
+        [](std::tuple<double, double, bool> const& t1, std::tuple<double, double, bool> const& t2) { return std::get<1>(t1) < std::get<1>(t2); });
+    minValue2 = std::get<1>(*std::get<0>(minMaxValue2IteratorPair));
+    maxValue2 = std::get<1>(*std::get<1>(minMaxValue2IteratorPair));
+    trueBins.resize(binsNumberAlongColumn1);
+    falseBins.resize(binsNumberAlongColumn1);
+    for (int i = 0; i < binsNumberAlongColumn1; ++i) {
+        trueBins[i].resize(binsNumberAlongColumn2);
+        falseBins[i].resize(binsNumberAlongColumn2);
+        for (int j = 0; j < binsNumberAlongColumn2; ++j) {
+            double leftEdgeColumn1 = minValue1 + (maxValue1 - minValue1) / binsNumberAlongColumn1 * i;
+            double rightEdgeColumn1 = minValue1 + (maxValue1 - minValue1) / binsNumberAlongColumn1 * (i + 1);
+            double leftEdgeColumn2 = minValue2 + (maxValue2 - minValue2) / binsNumberAlongColumn2 * i;
+            double rightEdgeColumn2 = minValue2 + (maxValue2 - minValue2) / binsNumberAlongColumn2 * (i + 1);
+            trueBins[i][j] = Bin2D(leftEdgeColumn1, rightEdgeColumn1, leftEdgeColumn2, rightEdgeColumn2);
+            falseBins[i][j] = Bin2D(leftEdgeColumn1, rightEdgeColumn1, leftEdgeColumn2, rightEdgeColumn2);
+        }
+    }
+    for (auto const& [value1, value2, boolValue] : data) {
+        int binIndex1 = std::clamp(static_cast<int>((value1 - minValue1) / (maxValue1 - minValue1) * binsNumberAlongColumn1), 0, binsNumberAlongColumn1 - 1);
+        int binIndex2 = std::clamp(static_cast<int>((value2 - minValue2) / (maxValue2 - minValue2) * binsNumberAlongColumn2), 0, binsNumberAlongColumn2 - 1);
+        if (boolValue) {
+            trueBins[binIndex1][binIndex2].valuesCount += 1;
+        }
+        else {
+            falseBins[binIndex1][binIndex2].valuesCount += 1;
+        }
+	}
+    drawingReady = true;
+    this->data = std::move(data);
+}
+
+void Histogram3D::sortDataAndUpdateHistogramAndBins() {
+    try {
+        std::sort(data.begin(), data.end(), [](std::tuple<double, double, bool>const& t1, std::tuple<double, double, bool>const& t2) { return std::get<1>(t1) < std::get<1>(t2); });
+        std::stable_sort(data.begin(), data.end(), [](std::tuple<double, double, bool>const& t1, std::tuple<double, double, bool>const& t2) { return std::get<0>(t1) < std::get<0>(t2); });
+        double minValue1 = trueBins.front().front().minColumn1;
+        double maxValue1 = trueBins.back().back().maxColumn1;
+        double minValue2 = trueBins.front().front().minColumn2;
+        double maxValue2 = trueBins.back().back().maxColumn2;
+        for (auto const& [value1, value2, boolValue] : data) {
+            int binIndex1 = std::clamp(static_cast<int>((value1 - minValue1) / (maxValue1 - minValue1) * trueBins.size()), 0, static_cast<int>(trueBins.size()) - 1);
+            int binIndex2 = std::clamp(static_cast<int>((value2 - minValue2) / (maxValue2 - minValue2) * trueBins.front().size()), 0, static_cast<int>(trueBins.front().size()) - 1);
+            if (boolValue) {
+                trueBins[binIndex1][binIndex2].sortedValues.emplace_back(value1, value2);
+            }
+            else {
+                falseBins[binIndex1][binIndex2].sortedValues.emplace_back(value1, value2);
+            }
+        }
+        sectioningReady = true;
+        data = std::vector<std::tuple<double, double, bool>>();
+    }
+    catch (std::exception e) {
+        std::cout << e.what() << std::endl;
+    }
+}

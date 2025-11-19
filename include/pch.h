@@ -21,5 +21,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <thread>
 
 #endif //PCH_H

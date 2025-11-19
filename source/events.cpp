@@ -64,7 +64,8 @@ namespace Events {
         }
     }
 
-    bool loadHistogramData(char* delimiter, char* column1, char* column2, char* boolColumn, bool skipFirstRow, bool convertToInt) {
+    bool loadHistogramData(char* delimiter, char* column1, char* column2, char* boolColumn,
+            bool skipFirstRow, bool convertToInt, int* binsNumber) {
         std::vector<std::string> missingFieldsErrors;
         if (!*delimiter) {
             missingFieldsErrors.push_back("Please provide delimiter field");
@@ -86,6 +87,10 @@ namespace Events {
             tinyfd_messageBox("Error", errorMessage.c_str(), "ok", "error", 1);
             return false;
 		}
+        if (binsNumber[0] <= 0 || binsNumber[1] <= 0) {
+            tinyfd_messageBox("Error", "Bins number must be positive", "ok", "error", 1);
+            return false;
+        }
         constexpr char const* filePattern[1] = { "*.csv" };
         const char* path = tinyfd_openFileDialog(
             "Load csv file",
@@ -122,6 +127,9 @@ namespace Events {
                 tinyfd_messageBox("Error", e.what(), "ok", "error", 1);
                 return false;
             }
+            Drawing::histogram3D = Histogram3D(binsNumber[0], binsNumber[1], data);
+            std::thread t(&Histogram3D::sortDataAndUpdateHistogramAndBins, &Drawing::histogram3D);
+            t.detach();
             return true;
         }
     }

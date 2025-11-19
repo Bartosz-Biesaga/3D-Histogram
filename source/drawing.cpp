@@ -7,6 +7,7 @@ namespace Drawing {
     bool perspectiveProjection = true;
     bool drawLoadDataInputs = true;
     bool drawUserGuide = true;
+    Histogram3D histogram3D;
 
     void initOpenGL() {
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -21,7 +22,7 @@ namespace Drawing {
             gluPerspective(45., (GLdouble)size.x / (GLdouble)size.y, 0.1, 100.0);
         }
         else {
-            float magic_number = camera.distance / 2.2;
+            float magic_number = static_cast<float>(camera.distance / 2.2);
             glOrtho(-magic_number * ((GLdouble)size.x / (GLdouble)size.y), magic_number * ((GLdouble)size.x / (GLdouble)size.y), -magic_number, magic_number, -3., 12.0);
         }
         glMatrixMode(GL_MODELVIEW);
@@ -75,6 +76,7 @@ namespace Drawing {
         static char fileBoolColumn[128]{};
         static bool skipFirstRow = false;
         static bool fileUseColumnNames = true;
+        static int binsNumber[2]{};
         ImGui::Begin("Load csv data");
             ImGui::PushItemWidth(20);
             ImGui::InputText("Single character column delimiter", fileDelimiter, 2);
@@ -92,8 +94,9 @@ namespace Drawing {
                 ImGui::Checkbox("Use column names", &fileUseColumnNames);
                 ImGui::Checkbox("Skip first row", &skipFirstRow);
             }
+            ImGui::InputInt2("Number of histogram\nbins for x/y variable", binsNumber);
             if (ImGui::Button("Select file and load")) {
-                bool dataLoaded = Events::loadHistogramData(fileDelimiter, fileColumn1, fileColumn2, fileBoolColumn, skipFirstRow, !fileUseColumnNames);
+                bool dataLoaded = Events::loadHistogramData(fileDelimiter, fileColumn1, fileColumn2, fileBoolColumn, skipFirstRow, !fileUseColumnNames, binsNumber);
                 if (dataLoaded) {
                     drawLoadDataInputs = false;
                 }

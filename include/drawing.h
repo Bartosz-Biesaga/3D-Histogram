@@ -1,5 +1,6 @@
 #pragma once
 #include "Spherical.h"
+#include "../include/Histogram3D.h"
 
 namespace Drawing {
 
@@ -7,6 +8,7 @@ namespace Drawing {
 	extern bool perspectiveProjection;
 	extern bool drawLoadDataInputs;
 	extern bool drawUserGuide;
+	extern Histogram3D histogram3D;
 
 	void initOpenGL();
 

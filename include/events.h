@@ -1,3 +1,5 @@
+#pragma once
+
 namespace Events {
 
 	void rotateScreen(sf::RenderWindow const& window, sf::Event const& event, sf::Vector2i& mouseLastPosition);
@@ -6,5 +8,6 @@ namespace Events {
 
 	void saveScreen(sf::RenderWindow const& window);
 
-	bool loadHistogramData(char* delimiter, char* column1, char* column2, char* boolColumn, bool skipFirstRow, bool convertToInt);
+	bool loadHistogramData(char* delimiter, char* column1, char* column2, char* boolColumn,
+		bool skipFirstRow, bool convertToInt, int* binsNumber);
 }
