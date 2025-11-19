@@ -65,25 +65,25 @@ namespace Events {
     }
 
     bool loadHistogramData(char* delimiter, char* column1, char* column2, char* boolColumn, bool skipFirstRow, bool convertToInt) {
-        std::vector<std::string> missing_fields_errors;
+        std::vector<std::string> missingFieldsErrors;
         if (!*delimiter) {
-            missing_fields_errors.push_back("Please provide delimiter field");
+            missingFieldsErrors.push_back("Please provide delimiter field");
         }
         if (!*column1) {
-			missing_fields_errors.push_back("Please provide first column field");
+			missingFieldsErrors.push_back("Please provide first column field");
         }
         if (!*column2) {
-            missing_fields_errors.push_back("Please provide second column field");
+            missingFieldsErrors.push_back("Please provide second column field");
         }
         if (!*boolColumn) {
-            missing_fields_errors.push_back("Please provide boolean column field");
+            missingFieldsErrors.push_back("Please provide boolean column field");
         }
-        if (!missing_fields_errors.empty()) {
-            std::string error_message = "Cannot load data due to missing fields:\n";
-            for (const auto& error : missing_fields_errors) {
-                error_message += "- " + error + "\n";
+        if (!missingFieldsErrors.empty()) {
+            std::string errorMessage = "Cannot load data due to missing fields:\n";
+            for (const auto& error : missingFieldsErrors) {
+                errorMessage += "- " + error + "\n";
             }
-            tinyfd_messageBox("Error", error_message.c_str(), "ok", "error", 1);
+            tinyfd_messageBox("Error", errorMessage.c_str(), "ok", "error", 1);
             return false;
 		}
         constexpr char const* filePattern[1] = { "*.csv" };
