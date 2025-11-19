@@ -5,4 +5,6 @@ namespace Events {
 	void zoomScreen(sf::RenderWindow const& window, sf::Event const& event);
 
 	void saveScreen(sf::RenderWindow const& window);
+
+	bool loadHistogramData(char* delimiter, char* column1, char* column2, char* boolColumn, bool skipFirstRow, bool convertToInt);
 }

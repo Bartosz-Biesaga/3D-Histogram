@@ -1,9 +1,12 @@
 #include "../include/pch.h"
 #include "../include/drawing.h"
+#include "../include/events.h"
 
 namespace Drawing {
     Spherical camera(3.0f, 1.0f, 0.2f);
     bool perspectiveProjection = true;
+    bool drawLoadDataInputs = true;
+    bool drawUserGuide = true;
 
     void initOpenGL() {
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -63,5 +66,55 @@ namespace Drawing {
                 }
             }
         glEnd();
+    }
+
+    void drawFileLoadUserInputs() {
+        static char fileDelimiter[2]{};
+        static char fileColumn1[128]{};
+        static char fileColumn2[128]{};
+        static char fileBoolColumn[128]{};
+        static bool skipFirstRow = false;
+        static bool fileUseColumnNames = true;
+        ImGui::Begin("Load csv data");
+            ImGui::PushItemWidth(20);
+            ImGui::InputText("Single character column delimiter", fileDelimiter, 2);
+            ImGui::PushItemWidth(150);
+            if (fileUseColumnNames) {
+                ImGui::InputText("First column name", fileColumn1, 128);
+                ImGui::InputText("Second column name", fileColumn2, 128);
+                ImGui::InputText("Boolean column name", fileBoolColumn, 128);
+                ImGui::Checkbox("Use column names", &fileUseColumnNames);
+            }
+            else {
+                ImGui::InputText("First column index", fileColumn1, 128);
+                ImGui::InputText("Second column index", fileColumn2, 128);
+                ImGui::InputText("Boolean column index", fileBoolColumn, 128);
+                ImGui::Checkbox("Use column names", &fileUseColumnNames);
+                ImGui::Checkbox("Skip first row", &skipFirstRow);
+            }
+            if (ImGui::Button("Select file and load")) {
+                bool dataLoaded = Events::loadHistogramData(fileDelimiter, fileColumn1, fileColumn2, fileBoolColumn, skipFirstRow, !fileUseColumnNames);
+                if (dataLoaded) {
+                    drawLoadDataInputs = false;
+                }
+            };
+        ImGui::End();
+    }
+
+    void drawUserGuideBox() {
+        static std::ifstream userGuideFile("user_guide.txt");
+        static std::string userGuideContent = "Missing user_guide.txt file!";
+        if (userGuideFile.is_open()) {
+            std::stringstream buffer;
+            buffer << userGuideFile.rdbuf();
+            userGuideContent = buffer.str();
+            userGuideFile.close();
+        }
+        ImGui::Begin("User Guide");
+            ImGui::Text(userGuideContent.c_str());
+        if (ImGui::Button("Hide")) {
+            Drawing::drawUserGuide = false;
+        }
+        ImGui::End();
     }
 }
