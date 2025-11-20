@@ -8,6 +8,7 @@ namespace Drawing {
     bool drawLoadDataInputs = true;
     bool drawUserGuide = true;
     Histogram3D histogram3D;
+    void (*drawingFunction)() = &drawDummyScene;
 
     void initOpenGL() {
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -37,36 +38,7 @@ namespace Drawing {
         gluLookAt(camera.getX(), camera.getY(), camera.getZ(),
             0.0, 0.0, 0.0,
             northOfCamera.getX(), northOfCamera.getY(), northOfCamera.getZ());
-
-        //uklad
-        glBegin(GL_LINES);
-            glColor3f(1.0, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(1.0, 0, 0);
-            glColor3f(0.0, 1.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, 1.0, 0);
-            glColor3f(0.0, 0.0, 1.0); glVertex3f(0, 0, 0); glVertex3f(0, 0, 1.0);
-        glEnd();
-
-        //Linie przerywane
-        glEnable(GL_LINE_STIPPLE);
-        glLineStipple(2, 0xAAAA);
-        glBegin(GL_LINES);
-            glColor3f(1.0, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(-1.0, 0, 0);
-            glColor3f(0.0, 1.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, -1.0, 0);
-            glColor3f(0.0, 0.0, 1.0); glVertex3f(0, 0, 0); glVertex3f(0, 0, -1.0);
-        glEnd();
-        glDisable(GL_LINE_STIPPLE);
-
-        //szescian
-        glLineWidth(2.0);
-        glColor3f(0, 0, 0);
-        glBegin(GL_LINES);
-            for (unsigned char i = 0; i < 2; i++) {
-                for (unsigned char j = 0; j < 2; j++) {
-                    glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j, -0.3f); glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j, 0.3f);
-                    glVertex3f(-0.3f, -0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j); glVertex3f(0.3f, -0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j);
-                    glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f, -0.3f + 0.6f * j); glVertex3f(-0.3f + 0.6f * (i ^ j), 0.3f, -0.3f + 0.6f * j);
-                }
-            }
-        glEnd();
+        drawingFunction();
     }
 
     void drawFileLoadUserInputs() {
@@ -99,6 +71,7 @@ namespace Drawing {
                 bool dataLoaded = Events::loadHistogramData(fileDelimiter, fileColumn1, fileColumn2, fileBoolColumn, skipFirstRow, !fileUseColumnNames, binsNumber);
                 if (dataLoaded) {
                     drawLoadDataInputs = false;
+                    drawingFunction = &drawHistogram;
                 }
             };
         ImGui::End();
@@ -119,5 +92,71 @@ namespace Drawing {
             Drawing::drawUserGuide = false;
         }
         ImGui::End();
+    }
+
+    void drawDummyScene() {
+        //uklad
+        glBegin(GL_LINES);
+        glColor3f(1.0, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(1.0, 0, 0);
+        glColor3f(0.0, 1.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, 1.0, 0);
+        glColor3f(0.0, 0.0, 1.0); glVertex3f(0, 0, 0); glVertex3f(0, 0, 1.0);
+        glEnd();
+
+        //Linie przerywane
+        glEnable(GL_LINE_STIPPLE);
+        glLineStipple(2, 0xAAAA);
+        glBegin(GL_LINES);
+        glColor3f(1.0, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(-1.0, 0, 0);
+        glColor3f(0.0, 1.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, -1.0, 0);
+        glColor3f(0.0, 0.0, 1.0); glVertex3f(0, 0, 0); glVertex3f(0, 0, -1.0);
+        glEnd();
+        glDisable(GL_LINE_STIPPLE);
+
+        //szescian
+        glLineWidth(2.0);
+        glColor3f(0, 0, 0);
+        glBegin(GL_LINES);
+        for (unsigned char i = 0; i < 2; i++) {
+            for (unsigned char j = 0; j < 2; j++) {
+                glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j, -0.3f); glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j, 0.3f);
+                glVertex3f(-0.3f, -0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j); glVertex3f(0.3f, -0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j);
+                glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f, -0.3f + 0.6f * j); glVertex3f(-0.3f + 0.6f * (i ^ j), 0.3f, -0.3f + 0.6f * j);
+            }
+        }
+        glEnd();
+    }
+
+    void drawHistogram() {
+        static const sf::Vector3f blue{ 3 / 255.f, 190 / 255.f, 252 / 255.f };
+        static const sf::Vector3f red{ 207 / 255.f, 48 / 255.f, 93 / 255.f };
+        for (int i = 0; i < histogram3D.trueBins.size(); ++i) {
+            for (int j = 0; j < histogram3D.trueBins[i].size(); ++j) {
+
+            }
+        }
+    }
+
+    void drawBar(sf::Vector3f leftBottomNearPoint, sf::Vector3f rightTopFarPoint, sf::Vector3f color, bool drawTopFace) {
+        glColor3f(color.x, color.y, color.z);
+        glBegin(GL_TRIANGLE_STRIP);
+            glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
+            glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+            glVertex3f(rightTopFarPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
+            glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+            glVertex3f(rightTopFarPoint.x, leftBottomNearPoint.y, rightTopFarPoint.z);
+            glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
+            glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, rightTopFarPoint.z);
+            glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
+            glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
+            glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+        glEnd();
+        if (drawTopFace) {
+            glBegin(GL_TRIANGLE_STRIP);
+                glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+                glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+                glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
+                glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
+            glEnd();
+        }
     }
 }

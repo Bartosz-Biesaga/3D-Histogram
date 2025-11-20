@@ -22,5 +22,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <vector>
+#include <array>
 
 #endif //PCH_H

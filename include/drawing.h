@@ -19,4 +19,10 @@ namespace Drawing {
 	void drawFileLoadUserInputs();
 
 	void drawUserGuideBox();
+
+	void drawDummyScene();
+
+	void drawHistogram();
+
+	void drawBar(sf::Vector3f nearLeftBottomPoint, sf::Vector3f farRightTopPoint, sf::Vector3f color, bool drawTopFace);
 }
