@@ -117,27 +117,22 @@ Histogram3D::Histogram3D(int binsNumberAlongColumn1, int binsNumberAlongColumn2,
 }
 
 void Histogram3D::sortDataAndUpdateHistogramAndBins() {
-    try {
-        std::sort(data.begin(), data.end(), [](std::tuple<double, double, bool>const& t1, std::tuple<double, double, bool>const& t2) { return std::get<1>(t1) < std::get<1>(t2); });
-        std::stable_sort(data.begin(), data.end(), [](std::tuple<double, double, bool>const& t1, std::tuple<double, double, bool>const& t2) { return std::get<0>(t1) < std::get<0>(t2); });
-        double minValue1 = trueBins.front().front().minColumn1;
-        double maxValue1 = trueBins.back().back().maxColumn1;
-        double minValue2 = trueBins.front().front().minColumn2;
-        double maxValue2 = trueBins.back().back().maxColumn2;
-        for (auto const& [value1, value2, boolValue] : data) {
-            int binIndex1 = std::clamp(static_cast<int>((value1 - minValue1) / (maxValue1 - minValue1) * trueBins.size()), 0, static_cast<int>(trueBins.size()) - 1);
-            int binIndex2 = std::clamp(static_cast<int>((value2 - minValue2) / (maxValue2 - minValue2) * trueBins.front().size()), 0, static_cast<int>(trueBins.front().size()) - 1);
-            if (boolValue) {
-                trueBins[binIndex1][binIndex2].sortedValues.emplace_back(value1, value2);
-            }
-            else {
-                falseBins[binIndex1][binIndex2].sortedValues.emplace_back(value1, value2);
-            }
+    std::sort(data.begin(), data.end(), [](std::tuple<double, double, bool>const& t1, std::tuple<double, double, bool>const& t2) { return std::get<1>(t1) < std::get<1>(t2); });
+    std::stable_sort(data.begin(), data.end(), [](std::tuple<double, double, bool>const& t1, std::tuple<double, double, bool>const& t2) { return std::get<0>(t1) < std::get<0>(t2); });
+    double minValue1 = trueBins.front().front().minColumn1;
+    double maxValue1 = trueBins.back().back().maxColumn1;
+    double minValue2 = trueBins.front().front().minColumn2;
+    double maxValue2 = trueBins.back().back().maxColumn2;
+    for (auto const& [value1, value2, boolValue] : data) {
+        int binIndex1 = std::clamp(static_cast<int>((value1 - minValue1) / (maxValue1 - minValue1) * trueBins.size()), 0, static_cast<int>(trueBins.size()) - 1);
+        int binIndex2 = std::clamp(static_cast<int>((value2 - minValue2) / (maxValue2 - minValue2) * trueBins.front().size()), 0, static_cast<int>(trueBins.front().size()) - 1);
+        if (boolValue) {
+            trueBins[binIndex1][binIndex2].sortedValues.emplace_back(value1, value2);
         }
-        sectioningReady = true;
-        data = std::vector<std::tuple<double, double, bool>>();
+        else {
+            falseBins[binIndex1][binIndex2].sortedValues.emplace_back(value1, value2);
+        }
     }
-    catch (std::exception e) {
-        std::cout << e.what() << std::endl;
-    }
+    sectioningReady = true;
+    data = std::vector<std::tuple<double, double, bool>>();
 }
