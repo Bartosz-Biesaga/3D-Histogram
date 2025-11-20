@@ -24,5 +24,5 @@ namespace Drawing {
 
 	void drawHistogram();
 
-	void drawBar(sf::Vector3f nearLeftBottomPoint, sf::Vector3f farRightTopPoint, sf::Vector3f color, bool drawTopFace);
+	void drawBar(sf::Vector3f const& nearLeftBottomPoint, sf::Vector3f const& farRightTopPoint, sf::Vector3f const& color, bool drawTopFace);
 }

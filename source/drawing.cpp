@@ -129,14 +129,47 @@ namespace Drawing {
     void drawHistogram() {
         static const sf::Vector3f blue{ 3 / 255.f, 190 / 255.f, 252 / 255.f };
         static const sf::Vector3f red{ 207 / 255.f, 48 / 255.f, 93 / 255.f };
+        static constexpr float maxHeight = 0.6f;
+        static constexpr float minHeight = -0.4f;
+        static constexpr float xLow = -0.75f;
+        static constexpr float xHigh = -xLow;
+        static constexpr float zLow = -0.75f;
+        static constexpr float zHigh = -zLow;
+
+        int highestValuesCount = 0;
         for (int i = 0; i < histogram3D.trueBins.size(); ++i) {
             for (int j = 0; j < histogram3D.trueBins[i].size(); ++j) {
-
+                highestValuesCount = std::max(histogram3D.trueBins[i][j].valuesCount + 
+                    histogram3D.falseBins[i][j].valuesCount, highestValuesCount);
+            }
+        }
+        for (int i = 0; i < histogram3D.trueBins.size(); ++i) {
+            for (int j = 0; j < histogram3D.trueBins[i].size(); ++j) {
+                const int totalCount = histogram3D.trueBins[i][j].valuesCount + histogram3D.falseBins[i][j].valuesCount;
+                if (totalCount == 0) {
+                    continue;
+                }
+                const float trueToAllProportion = static_cast<float>(histogram3D.trueBins[i][j].valuesCount) / totalCount;
+                const float left = xLow + (xHigh - xLow) / histogram3D.trueBins.size() * i;
+                const float right = xLow + (xHigh - xLow) / histogram3D.trueBins.size() * (i + 1);
+                const float _near = zLow + (zHigh - zLow) / histogram3D.trueBins[i].size() * j;
+                const float _far = zLow + (zHigh - zLow) / histogram3D.trueBins[i].size() * (j + 1);
+                const float top = static_cast<float>(totalCount) / highestValuesCount * maxHeight;
+                if (trueToAllProportion == 1) {
+                    drawBar({ left, minHeight, _near }, { right, top, _far }, red, true);
+                }
+                else if (trueToAllProportion == 0) {
+                    drawBar({ left, minHeight, _near }, { right, top, _far }, blue, true);
+                }
+                else {
+                    drawBar({ left, minHeight, _near }, { right, trueToAllProportion * top, _far }, red, false);
+                    drawBar({ left, trueToAllProportion * top, _near }, { right, top, _far }, blue, true);
+                }
             }
         }
     }
 
-    void drawBar(sf::Vector3f leftBottomNearPoint, sf::Vector3f rightTopFarPoint, sf::Vector3f color, bool drawTopFace) {
+    void drawBar(sf::Vector3f const &leftBottomNearPoint, sf::Vector3f const& rightTopFarPoint, sf::Vector3f const& color, bool drawTopFace) {
         glColor3f(color.x, color.y, color.z);
         glBegin(GL_TRIANGLE_STRIP);
             glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
