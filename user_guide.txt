@@ -15,5 +15,8 @@
   - column names = cells' contents from first row in csv file,
   - column indices = column's 0-based index in csv file,
   - first/second column = x/y variables of histogram
+  - bool column is used to mark proportion of data samples with true label to 
+    all data in given bin using red bar color
+  - in bool column "true", "True" and "1" are the only values considered true
   - lines must end with newline,
   - cells' contents are trimmed from whitespaces.
