@@ -7,12 +7,16 @@ namespace Drawing {
     bool perspectiveProjection = true;
     bool drawLoadDataInputs = true;
     bool drawUserGuide = true;
+    sf::Vector3f scenePosition{ 0.0f, 0.0f, 0.0f };
     Histogram3D histogram3D;
     void (*drawingFunction)() = &drawDummyScene;
 
     void initOpenGL() {
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0f, 1.0f);
+        glLineWidth(2.0f);
     }
 
     void reshapeScreen(sf::Vector2u size) {
@@ -38,6 +42,7 @@ namespace Drawing {
         gluLookAt(camera.getX(), camera.getY(), camera.getZ(),
             0.0, 0.0, 0.0,
             northOfCamera.getX(), northOfCamera.getY(), northOfCamera.getZ());
+        glTranslatef(scenePosition.x, scenePosition.y, scenePosition.z);
         drawingFunction();
     }
 
@@ -145,7 +150,7 @@ namespace Drawing {
         }
         for (int i = 0; i < histogram3D.trueBins.size(); ++i) {
             for (int j = 0; j < histogram3D.trueBins[i].size(); ++j) {
-                const int totalCount = histogram3D.trueBins[i][j].valuesCount + histogram3D.falseBins[i][j].valuesCount;
+                int totalCount = histogram3D.trueBins[i][j].valuesCount + histogram3D.falseBins[i][j].valuesCount;
                 if (totalCount == 0) {
                     continue;
                 }
@@ -154,7 +159,7 @@ namespace Drawing {
                 const float right = xLow + (xHigh - xLow) / histogram3D.trueBins.size() * (i + 1);
                 const float _near = zLow + (zHigh - zLow) / histogram3D.trueBins[i].size() * j;
                 const float _far = zLow + (zHigh - zLow) / histogram3D.trueBins[i].size() * (j + 1);
-                const float top = static_cast<float>(totalCount) / highestValuesCount * maxHeight;
+                const float top = minHeight + static_cast<float>(totalCount) / highestValuesCount * (maxHeight - minHeight);
                 if (trueToAllProportion == 1) {
                     drawBar({ left, minHeight, _near }, { right, top, _far }, red, true);
                 }
@@ -162,8 +167,8 @@ namespace Drawing {
                     drawBar({ left, minHeight, _near }, { right, top, _far }, blue, true);
                 }
                 else {
-                    drawBar({ left, minHeight, _near }, { right, trueToAllProportion * top, _far }, red, false);
-                    drawBar({ left, trueToAllProportion * top, _near }, { right, top, _far }, blue, true);
+                    drawBar({ left, minHeight, _near }, { right, minHeight + trueToAllProportion * (top - minHeight), _far }, red, false);
+                    drawBar({ left, minHeight + trueToAllProportion * (top - minHeight), _near }, { right, top, _far }, blue, true);
                 }
             }
         }
@@ -183,7 +188,34 @@ namespace Drawing {
             glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
             glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
         glEnd();
+        glColor3f(0, 0, 0);
+        glBegin(GL_LINE_STRIP);
+            glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
+            glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+            glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+            glVertex3f(rightTopFarPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
+            glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
+        glEnd();
+        glBegin(GL_LINE_STRIP);
+            glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+            glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
+            glVertex3f(rightTopFarPoint.x, leftBottomNearPoint.y, rightTopFarPoint.z);
+            glVertex3f(rightTopFarPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
+        glEnd();
+        glBegin(GL_LINE_STRIP);
+            glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
+            glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
+            glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, rightTopFarPoint.z);
+            glVertex3f(rightTopFarPoint.x, leftBottomNearPoint.y, rightTopFarPoint.z);
+        glEnd();
+        glBegin(GL_LINE_STRIP);
+            glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
+            glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
+            glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, leftBottomNearPoint.z);
+            glVertex3f(leftBottomNearPoint.x, leftBottomNearPoint.y, rightTopFarPoint.z);
+        glEnd();
         if (drawTopFace) {
+            glColor3f(color.x, color.y, color.z);
             glBegin(GL_TRIANGLE_STRIP);
                 glVertex3f(leftBottomNearPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
                 glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, leftBottomNearPoint.z);
