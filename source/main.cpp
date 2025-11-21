@@ -57,6 +57,7 @@ int main() {
                 if (event.key.code == sfk::H && sfk::isKeyPressed(sfk::LControl)) {
                     Drawing::drawUserGuide = !Drawing::drawUserGuide;
                 }
+                Events::moveScene(event);
             }
         }
 		

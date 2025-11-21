@@ -5,6 +5,7 @@
 namespace Drawing {
 
 	extern Spherical camera;
+	extern sf::Vector3f scenePosition;
 	extern bool perspectiveProjection;
 	extern bool drawLoadDataInputs;
 	extern bool drawUserGuide;

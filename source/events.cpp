@@ -46,6 +46,52 @@ namespace Events {
         }
     }
 
+    void moveScene(sf::Event const& event) {
+        float step = 0.1f;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt)) {
+            step = 0.05f;
+        } 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+            step = 0.025f;
+        }
+        if (event.key.code == sf::Keyboard::Left) {
+            Drawing::scenePosition.x -= step;
+            if (Drawing::scenePosition.x < -3.f) {
+                Drawing::scenePosition.x = -3.f;
+            }
+        }
+		if (event.key.code == sf::Keyboard::Right) {
+            Drawing::scenePosition.x += step;
+            if (Drawing::scenePosition.x > 2.f) {
+                Drawing::scenePosition.x = 2.f;
+            }
+        }
+        if(event.key.code == sf::Keyboard::Up) {
+            Drawing::scenePosition.z -= step;
+            if (Drawing::scenePosition.z < -2.f) {
+                Drawing::scenePosition.z = -2.f;
+            }
+		}
+        if (event.key.code == sf::Keyboard::Down) {
+            Drawing::scenePosition.z += step;
+            if (Drawing::scenePosition.z > 2.f) {
+                Drawing::scenePosition.z = 2.f;
+            }
+		}
+        if (event.key.code == sf::Keyboard::E) {
+            Drawing::scenePosition.y += step;
+            if (Drawing::scenePosition.y > 1.f) {
+                Drawing::scenePosition.y = 1.f;
+			}
+        }
+		if (event.key.code == sf::Keyboard::Q) {
+            Drawing::scenePosition.y -= step;
+            if (Drawing::scenePosition.y < -1.f) {
+                Drawing::scenePosition.y = -1.f;
+            }
+        }
+    }
+
     void saveScreen(sf::RenderWindow const& window) {
         constexpr char const* filePattern[1] = { "*.png" };
         sf::Texture texture;

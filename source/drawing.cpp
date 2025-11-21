@@ -4,10 +4,10 @@
 
 namespace Drawing {
     Spherical camera(3.0f, 1.0f, 0.2f);
+    sf::Vector3f scenePosition{ 0.0f, 0.0f, 0.0f };
     bool perspectiveProjection = true;
     bool drawLoadDataInputs = true;
     bool drawUserGuide = true;
-    sf::Vector3f scenePosition{ 0.0f, 0.0f, 0.0f };
     Histogram3D histogram3D;
     void (*drawingFunction)() = &drawDummyScene;
 
