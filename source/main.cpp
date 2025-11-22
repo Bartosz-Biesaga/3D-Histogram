@@ -12,6 +12,7 @@ int main() {
     sf::ContextSettings context(24, 0, 0, 4, 5);
     sf::RenderWindow window(sf::VideoMode(1280, 720), "3D Histogram", 7U, context);
     sf::Clock deltaClock;
+    ImGui::SFML::Init(window);
     sfe event;
     window.setVerticalSyncEnabled(true);
     Drawing::reshapeScreen(window.getSize());
@@ -19,23 +20,9 @@ int main() {
 	sf::Vector2i mouseLastPosition{ 0, 0 };
 	bool mouseLastPositionInitialized = false;
     bool willSaveScreen = false;
-    std::ifstream userGuideFile("user_guide.txt");
-    std::string userGuideContent = "Missing user_guide.txt file!";
-    if (userGuideFile.is_open()) {
-        std::stringstream buffer;
-        buffer << userGuideFile.rdbuf();
-        userGuideContent = buffer.str();
-    }
-    tinyfd_messageBox(
-        "User Guide",
-        userGuideContent.c_str(),
-        "OK",
-        "info",
-        1
-    );
-
     while (running) {
         while (window.pollEvent(event)) {
+            ImGui::SFML::ProcessEvent(event);
             if (event.type == sfe::Closed) {
                 running = false;
             }
@@ -64,16 +51,32 @@ int main() {
                     window.clear(sf::Color::White);
                     willSaveScreen = true;
                 }
+                if (event.key.code == sfk::L && sfk::isKeyPressed(sfk::LControl)) {
+                    Drawing::drawLoadDataInputs = !Drawing::drawLoadDataInputs;
+                }
+                if (event.key.code == sfk::H && sfk::isKeyPressed(sfk::LControl)) {
+                    Drawing::drawUserGuide = !Drawing::drawUserGuide;
+                }
+                Events::moveScene(event);
             }
         }
 		
         Drawing::drawScene();
+        ImGui::SFML::Update(window, deltaClock.restart());
         if (willSaveScreen) {
             Events::saveScreen(window);
             willSaveScreen = false;
         }
+        if (Drawing::drawLoadDataInputs) {
+            Drawing::drawFileLoadUserInputs();
+        }
+        if (Drawing::drawUserGuide) {
+            Drawing::drawUserGuideBox();
+        }
+        ImGui::SFML::Render(window);
         window.display();
     }
+    ImGui::SFML::Shutdown();
     return 0;
 }
 

@@ -4,5 +4,23 @@
   - hold <left alt> or <left control> while rotating/zooming to perform them with higher precision,
   - press <P> to switch between perspective/orthogonal projection.
 
+* How to position histogram:
+  - use <left>/<right>, <up>/<down> arrow keys and <Q>/<E> to translate the histogram.
+  - additionally hold <left alt> or <left control> for finer control
+
+* GUI enabling/disabling:
+  - press <left control> + <H> to enable/disable user guide,
+  - press <left control> + <L> to enable/disable data loading GUI,
+
 * Misc:
   - press <left control> + <S> to save a screenshot.
+
+* Data loading:
+  - column names = cells' contents from first row in csv file,
+  - column indices = column's 0-based index in csv file,
+  - first/second column = x/y variables of histogram
+  - bool column is used to mark proportion of data samples with true label to 
+    all data in given bin using red bar color
+  - in bool column "true", "True" and "1" are the only values considered true
+  - lines must end with newline,
+  - cells' contents are trimmed from whitespaces.

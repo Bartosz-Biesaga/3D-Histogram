@@ -15,6 +15,9 @@ tinyfiledialogs.*
 *.userosscache
 *.sln.docstates
 *.env
+imgui/*
+*.ini
+data/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
