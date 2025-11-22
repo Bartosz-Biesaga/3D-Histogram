@@ -22,6 +22,12 @@ namespace Events {
         else if (Drawing::camera.phi < 0.0f) {
             Drawing::camera.phi = 0.0f;
         }
+        if (Drawing::camera.theta > 2.f * std::numbers::pi) {
+            Drawing::camera.theta -= 2.f * std::numbers::pi;
+        }
+        if (Drawing::camera.theta < 0) {
+            Drawing::camera.theta += 2.f * std::numbers::pi;
+        }
         mouseLastPosition.x = event.mouseMove.x;
 		mouseLastPosition.y = event.mouseMove.y;
 	}
