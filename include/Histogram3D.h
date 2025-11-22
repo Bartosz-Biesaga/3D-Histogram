@@ -16,6 +16,7 @@ struct Histogram3D {
 	int highestValuesCount = 0;
 	bool isGridWanted = true;
 	float gridBinsStep[2];
+	float gridHeightStep = (maxHeight - minHeight) / 10.f;
 	bool sectioningReady = false;
 	std::vector<std::tuple<double, double, bool>> data;
 

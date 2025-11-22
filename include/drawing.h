@@ -26,4 +26,6 @@ namespace Drawing {
 	void drawHistogram();
 
 	void drawBar(sf::Vector3f const& nearLeftBottomPoint, sf::Vector3f const& farRightTopPoint, sf::Vector3f const& color, bool drawTopFace);
+
+	void drawGrid3D();
 }
