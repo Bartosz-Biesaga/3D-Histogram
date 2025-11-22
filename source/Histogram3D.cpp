@@ -152,33 +152,29 @@ void Histogram3D::prepareForDrawing() {
     for (int i = 0; i < trueBins.size(); ++i) {
         for (int j = 0; j < trueBins[i].size(); ++j) {
             int totalCount = trueBins[i][j].valuesCount + falseBins[i][j].valuesCount;
+            float trueToAllProportion;
             if (totalCount == 0) {
-                continue;
+                trueToAllProportion = 0;
             }
-            const float trueToAllProportion = static_cast<float>(trueBins[i][j].valuesCount) / totalCount;
+            else {
+                trueToAllProportion = static_cast<float>(trueBins[i][j].valuesCount) / totalCount;
+            }
             const float left = xLow + (xHigh - xLow) / trueBins.size() * i;
             const float right = xLow + (xHigh - xLow) / trueBins.size() * (i + 1);
             const float _near = zLow + (zHigh - zLow) / trueBins[i].size() * j;
             const float _far = zLow + (zHigh - zLow) / trueBins[i].size() * (j + 1);
             const float top = minHeight + static_cast<float>(totalCount) / highestValuesCount * (maxHeight - minHeight);
+            trueBins[i][j].leftBottomNearPoint = { left, minHeight, _near };
+            trueBins[i][j].rightTopFarPoint = { right, minHeight + trueToAllProportion * (top - minHeight), _far };
             if (trueToAllProportion == 1) {
-                trueBins[i][j].leftBottomNearPoint = { left, minHeight, _near };
-                trueBins[i][j].rightTopFarPoint = { right, top, _far };
                 trueBins[i][j].drawTopFace = true;
             }
-            else if (trueToAllProportion == 0) {
-                falseBins[i][j].leftBottomNearPoint = { left, minHeight, _near };
-                falseBins[i][j].rightTopFarPoint = { right, top, _far };
-                falseBins[i][j].drawTopFace = true;
-            }
             else {
-                trueBins[i][j].leftBottomNearPoint = { left, minHeight, _near };
-                trueBins[i][j].rightTopFarPoint = { right, minHeight + trueToAllProportion * (top - minHeight), _far };
                 trueBins[i][j].drawTopFace = false;
-                falseBins[i][j].leftBottomNearPoint = { left, minHeight + trueToAllProportion * (top - minHeight), _near };
-                falseBins[i][j].rightTopFarPoint = { right, top, _far };
-                falseBins[i][j].drawTopFace = true;
             }
+            falseBins[i][j].leftBottomNearPoint = { left, minHeight + trueToAllProportion * (top - minHeight), _near };
+            falseBins[i][j].rightTopFarPoint = { right, top, _far };
+            falseBins[i][j].drawTopFace = true;
         }
     }
 }
