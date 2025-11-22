@@ -132,45 +132,22 @@ namespace Drawing {
     }
 
     void drawHistogram() {
-        static const sf::Vector3f blue{ 3 / 255.f, 190 / 255.f, 252 / 255.f };
-        static const sf::Vector3f red{ 207 / 255.f, 48 / 255.f, 93 / 255.f };
-        static constexpr float maxHeight = 0.6f;
-        static constexpr float minHeight = -0.4f;
-        static constexpr float xLow = -0.75f;
-        static constexpr float xHigh = -xLow;
-        static constexpr float zLow = -0.75f;
-        static constexpr float zHigh = -zLow;
-
-        int highestValuesCount = 0;
         for (int i = 0; i < histogram3D.trueBins.size(); ++i) {
             for (int j = 0; j < histogram3D.trueBins[i].size(); ++j) {
-                highestValuesCount = std::max(histogram3D.trueBins[i][j].valuesCount + 
-                    histogram3D.falseBins[i][j].valuesCount, highestValuesCount);
+                if (histogram3D.trueBins[i][j].valuesCount != 0) {
+                    drawBar(histogram3D.trueBins[i][j].leftBottomNearPoint,
+                        histogram3D.trueBins[i][j].rightTopFarPoint,
+                        Histogram3D::red, histogram3D.trueBins[i][j].drawTopFace);
+                }
+                if (histogram3D.falseBins[i][j].valuesCount != 0) {
+                    drawBar(histogram3D.falseBins[i][j].leftBottomNearPoint,
+                        histogram3D.falseBins[i][j].rightTopFarPoint,
+                        Histogram3D::blue, histogram3D.falseBins[i][j].drawTopFace);
+                }
             }
         }
-        for (int i = 0; i < histogram3D.trueBins.size(); ++i) {
-            for (int j = 0; j < histogram3D.trueBins[i].size(); ++j) {
-                int totalCount = histogram3D.trueBins[i][j].valuesCount + histogram3D.falseBins[i][j].valuesCount;
-                if (totalCount == 0) {
-                    continue;
-                }
-                const float trueToAllProportion = static_cast<float>(histogram3D.trueBins[i][j].valuesCount) / totalCount;
-                const float left = xLow + (xHigh - xLow) / histogram3D.trueBins.size() * i;
-                const float right = xLow + (xHigh - xLow) / histogram3D.trueBins.size() * (i + 1);
-                const float _near = zLow + (zHigh - zLow) / histogram3D.trueBins[i].size() * j;
-                const float _far = zLow + (zHigh - zLow) / histogram3D.trueBins[i].size() * (j + 1);
-                const float top = minHeight + static_cast<float>(totalCount) / highestValuesCount * (maxHeight - minHeight);
-                if (trueToAllProportion == 1) {
-                    drawBar({ left, minHeight, _near }, { right, top, _far }, red, true);
-                }
-                else if (trueToAllProportion == 0) {
-                    drawBar({ left, minHeight, _near }, { right, top, _far }, blue, true);
-                }
-                else {
-                    drawBar({ left, minHeight, _near }, { right, minHeight + trueToAllProportion * (top - minHeight), _far }, red, false);
-                    drawBar({ left, minHeight + trueToAllProportion * (top - minHeight), _near }, { right, top, _far }, blue, true);
-                }
-            }
+        if (histogram3D.isGridWanted) {
+            drawGrid();
         }
     }
 
@@ -223,5 +200,9 @@ namespace Drawing {
                 glVertex3f(rightTopFarPoint.x, rightTopFarPoint.y, rightTopFarPoint.z);
             glEnd();
         }
+    }
+
+    void drawGrid() {
+
     }
 }

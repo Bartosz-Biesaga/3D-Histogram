@@ -3,8 +3,10 @@
 struct Bin2D {
 	double minColumn1, minColumn2, maxColumn1, maxColumn2;
 	int valuesCount = 0;
+	sf::Vector3f leftBottomNearPoint;
+	sf::Vector3f rightTopFarPoint;
+	bool drawTopFace;
 	std::vector<std::pair<double, double>> sortedValues;
-	// ?zmienna pomagaj¹ca w rysowaniu przekroji, np. indeks wartoœci na granicy przekroju
 
 	Bin2D() {};
 

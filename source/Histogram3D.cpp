@@ -1,6 +1,9 @@
 #include "../include/pch.h"
 #include "../include/Histogram3D.h"
 
+const sf::Vector3f Histogram3D::blue{ 3 / 255.f, 190 / 255.f, 252 / 255.f };
+const sf::Vector3f Histogram3D::red{ 207 / 255.f, 48 / 255.f, 93 / 255.f };
+
 std::vector<std::string> Histogram3D::getNextLineAndSplitIntoTokens(std::istream& istream, char delimiter) {
      std::vector<std::string> result;
      std::string line;
@@ -112,7 +115,9 @@ Histogram3D::Histogram3D(int binsNumberAlongColumn1, int binsNumberAlongColumn2,
             falseBins[binIndex1][binIndex2].valuesCount += 1;
         }
 	}
-    drawingReady = true;
+    gridBinsStep[0] = binsNumberAlongColumn1 / 10.f;
+    gridBinsStep[1] = binsNumberAlongColumn2 / 10.f;
+    prepareForDrawing();
     this->data = std::move(data);
 }
 
@@ -135,4 +140,45 @@ void Histogram3D::sortDataAndUpdateHistogramAndBins() {
     }
     sectioningReady = true;
     data = std::vector<std::tuple<double, double, bool>>();
+}
+
+void Histogram3D::prepareForDrawing() {
+    for (int i = 0; i < trueBins.size(); ++i) {
+        for (int j = 0; j < trueBins[i].size(); ++j) {
+            highestValuesCount = std::max(trueBins[i][j].valuesCount +
+                falseBins[i][j].valuesCount, highestValuesCount);
+        }
+    }
+    for (int i = 0; i < trueBins.size(); ++i) {
+        for (int j = 0; j < trueBins[i].size(); ++j) {
+            int totalCount = trueBins[i][j].valuesCount + falseBins[i][j].valuesCount;
+            if (totalCount == 0) {
+                continue;
+            }
+            const float trueToAllProportion = static_cast<float>(trueBins[i][j].valuesCount) / totalCount;
+            const float left = xLow + (xHigh - xLow) / trueBins.size() * i;
+            const float right = xLow + (xHigh - xLow) / trueBins.size() * (i + 1);
+            const float _near = zLow + (zHigh - zLow) / trueBins[i].size() * j;
+            const float _far = zLow + (zHigh - zLow) / trueBins[i].size() * (j + 1);
+            const float top = minHeight + static_cast<float>(totalCount) / highestValuesCount * (maxHeight - minHeight);
+            if (trueToAllProportion == 1) {
+                trueBins[i][j].leftBottomNearPoint = { left, minHeight, _near };
+                trueBins[i][j].rightTopFarPoint = { right, top, _far };
+                trueBins[i][j].drawTopFace = true;
+            }
+            else if (trueToAllProportion == 0) {
+                falseBins[i][j].leftBottomNearPoint = { left, minHeight, _near };
+                falseBins[i][j].rightTopFarPoint = { right, top, _far };
+                falseBins[i][j].drawTopFace = true;
+            }
+            else {
+                trueBins[i][j].leftBottomNearPoint = { left, minHeight, _near };
+                trueBins[i][j].rightTopFarPoint = { right, minHeight + trueToAllProportion * (top - minHeight), _far };
+                trueBins[i][j].drawTopFace = false;
+                falseBins[i][j].leftBottomNearPoint = { left, minHeight + trueToAllProportion * (top - minHeight), _near };
+                falseBins[i][j].rightTopFarPoint = { right, top, _far };
+                falseBins[i][j].drawTopFace = true;
+            }
+        }
+    }
 }

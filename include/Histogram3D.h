@@ -2,10 +2,20 @@
 #include "../include/Bin2D.h"
 
 struct Histogram3D {
-public:
+	static const sf::Vector3f blue;
+	static const sf::Vector3f red;
+	static constexpr float maxHeight = 0.6f;
+	static constexpr float minHeight = -0.4f;
+	static constexpr float xLow = -0.75f;
+	static constexpr float xHigh = -xLow;
+	static constexpr float zLow = -0.75f;
+	static constexpr float zHigh = -zLow;
+
 	std::vector<std::vector<Bin2D>> trueBins;
 	std::vector<std::vector<Bin2D>> falseBins;
-	bool drawingReady = false;
+	int highestValuesCount = 0;
+	bool isGridWanted = true;
+	float gridBinsStep[2];
 	bool sectioningReady = false;
 	std::vector<std::tuple<double, double, bool>> data;
 
@@ -19,10 +29,11 @@ public:
 	static std::vector<std::tuple<double, double, bool>> loadData(std::string const &csvPath, char delimiter,
             std::string const &column1Name, std::string const &column2Name, std::string const &boolColumnName);
 
-
 	static std::vector<std::string> getNextLineAndSplitIntoTokens(std::istream& str, char delimiter);
 
 	static int getColumnNumberByName(std::vector<std::string>, std::string const& columnName);
 
 	void sortDataAndUpdateHistogramAndBins();
+
+	void prepareForDrawing();
 };
