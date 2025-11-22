@@ -4,6 +4,10 @@
   - hold <left alt> or <left control> while rotating/zooming to perform them with higher precision,
   - press <P> to switch between perspective/orthogonal projection.
 
+* How to position histogram:
+  - use <left>/<right>, <up>/<down> arrow keys and <Q>/<E> to translate the histogram.
+  - additionally hold <left alt> or <left control> for finer control
+
 * GUI enabling/disabling:
   - press <left control> + <H> to enable/disable user guide,
   - press <left control> + <L> to enable/disable data loading GUI,

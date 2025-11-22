@@ -133,8 +133,8 @@ namespace Events {
             tinyfd_messageBox("Error", errorMessage.c_str(), "ok", "error", 1);
             return false;
 		}
-        if (binsNumber[0] <= 0 || binsNumber[1] <= 0) {
-            tinyfd_messageBox("Error", "Bins number must be positive", "ok", "error", 1);
+        if (binsNumber[0] <= 1 || binsNumber[1] <= 1) {
+            tinyfd_messageBox("Error", "Bins number must be greater than 1", "ok", "error", 1);
             return false;
         }
         constexpr char const* filePattern[1] = { "*.csv" };
