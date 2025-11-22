@@ -207,31 +207,66 @@ namespace Drawing {
 		glColor3f(0.7f, 0.7f, 0.7f);
         const float xStep = histogram3D.trueBins[1][0].leftBottomNearPoint.x - histogram3D.trueBins[0][0].leftBottomNearPoint.x;
         const float zStep = histogram3D.trueBins[0][1].leftBottomNearPoint.z - histogram3D.trueBins[0][0].leftBottomNearPoint.z;
+		bool NeedToFlipX = camera.theta > std::numbers::pi && camera.theta < 2 * std::numbers::pi;
+		bool NeedToFlipZ = camera.theta > std::numbers::pi / 2 && camera.theta < 3 * std::numbers::pi / 2;
 		glBegin(GL_LINES);
+            // horizontal grid
             for (float x = Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep;
                     x <= Histogram3D::xHigh + histogram3D.gridBinsStep[0] * xStep + eps;
                     x += histogram3D.gridBinsStep[0] * xStep) {
                 glVertex3f(x, Histogram3D::minHeight - 0.2f, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
                 glVertex3f(x, Histogram3D::minHeight - 0.2f, Histogram3D::zHigh + histogram3D.gridBinsStep[1] * zStep);
-                glVertex3f(x, Histogram3D::minHeight - 0.2f, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
-                glVertex3f(x, Histogram3D::maxHeight + 0.1f, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
             }
-			for (float z = Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep;
+            for (float z = Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep;
                     z <= Histogram3D::zHigh + histogram3D.gridBinsStep[1] * zStep + eps;
                     z += histogram3D.gridBinsStep[1] * zStep) {
                 glVertex3f(Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep, Histogram3D::minHeight - 0.2f, z);
                 glVertex3f(Histogram3D::xHigh + histogram3D.gridBinsStep[0] * xStep, Histogram3D::minHeight - 0.2f, z);
+            }
+        glEnd();
+        // vertical grid x variable
+        if (NeedToFlipX) {
+            glPushMatrix();
+            glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+        }
+        glBegin(GL_LINES);
+            for (float x = Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep;
+                    x <= Histogram3D::xHigh + histogram3D.gridBinsStep[0] * xStep + eps;
+                    x += histogram3D.gridBinsStep[0] * xStep) {
+                glVertex3f(x, Histogram3D::minHeight - 0.2f, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
+                glVertex3f(x, Histogram3D::maxHeight + 0.1f, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
+            }
+            for (float y = Histogram3D::minHeight - 0.2f;
+                    y <= Histogram3D::maxHeight + 0.1f + eps;
+                    y += histogram3D.gridHeightStep) {
+                glVertex3f(Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep, y, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
+                glVertex3f(Histogram3D::xHigh + histogram3D.gridBinsStep[0] * xStep, y, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
+            }
+        glEnd();
+        if (NeedToFlipX) {
+            glPopMatrix();
+        }
+        //vertical grid z variable
+        if (NeedToFlipZ) {
+            glPushMatrix();
+            glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+        }
+        glBegin(GL_LINES);
+            for (float z = Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep;
+                    z <= Histogram3D::zHigh + histogram3D.gridBinsStep[1] * zStep + eps;
+                    z += histogram3D.gridBinsStep[1] * zStep) {
                 glVertex3f(Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep, Histogram3D::minHeight - 0.2f, z);
                 glVertex3f(Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep, Histogram3D::maxHeight + 0.1f, z);
             }
-            for(float y = Histogram3D::minHeight - 0.2f;
+            for (float y = Histogram3D::minHeight - 0.2f;
                     y <= Histogram3D::maxHeight + 0.1f + eps;
-				    y += histogram3D.gridHeightStep) {
-                glVertex3f(Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep, y, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
-                glVertex3f(Histogram3D::xHigh + histogram3D.gridBinsStep[0] * xStep, y, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
+                    y += histogram3D.gridHeightStep) {
                 glVertex3f(Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep, y, Histogram3D::zLow - histogram3D.gridBinsStep[1] * zStep);
                 glVertex3f(Histogram3D::xLow - histogram3D.gridBinsStep[0] * xStep, y, Histogram3D::zHigh + histogram3D.gridBinsStep[1] * zStep);
             }
         glEnd();
+        if (NeedToFlipZ) {
+            glPopMatrix();
+        }
     }
 }
