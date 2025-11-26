@@ -185,4 +185,20 @@ namespace Events {
             return true;
         }
     }
+
+    void updateGridSquaresNumbers(int *gridSquaresNumbers) {
+        bool modifyGridSquaresNumber = true;
+        for (int i = 0; i < 3; ++i) {
+            if (gridSquaresNumbers[i] <= 0) {
+                tinyfd_messageBox("Error", "Grid squares number must be greater than 0!", "ok", "error", 1);
+                modifyGridSquaresNumber = false;
+                break;
+            }
+        }
+        if (modifyGridSquaresNumber) {
+            Drawing::histogram3D.gridBinsStep[0] = Drawing::histogram3D.trueBins.size() / static_cast<float>(gridSquaresNumbers[0]);
+            Drawing::histogram3D.gridBinsStep[1] = Drawing::histogram3D.trueBins.front().size() / static_cast<float>(gridSquaresNumbers[1]);
+            Drawing::histogram3D.gridHeightStep = (Histogram3D::maxHeight - Histogram3D::minHeight) / static_cast<float>(gridSquaresNumbers[2]);
+        }
+    }
 }

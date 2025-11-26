@@ -57,6 +57,9 @@ int main() {
                 if (event.key.code == sfk::H && sfk::isKeyPressed(sfk::LControl)) {
                     Drawing::drawUserGuide = !Drawing::drawUserGuide;
                 }
+                if (event.key.code == sfk::M && sfk::isKeyPressed(sfk::LControl)) {
+                    Drawing::drawHistogramInputs = !Drawing::drawHistogramInputs;
+                }
                 Events::moveScene(event);
             }
         }
@@ -71,7 +74,10 @@ int main() {
             Drawing::drawFileLoadUserInputs();
         }
         if (Drawing::drawUserGuide) {
-            Drawing::drawUserGuideBox();
+            Drawing::drawUserGuideWindow();
+        }
+        if (Drawing::drawHistogramInputs) {
+            Drawing::drawHistogramInputsWindow();
         }
         ImGui::SFML::Render(window);
         window.display();

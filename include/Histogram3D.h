@@ -14,10 +14,11 @@ struct Histogram3D {
 	std::vector<std::vector<Bin2D>> trueBins;
 	std::vector<std::vector<Bin2D>> falseBins;
 	int highestValuesCount = 0;
-	bool isGridWanted = true;
 	float gridBinsStep[2];
 	float gridHeightStep = (maxHeight - minHeight) / 10.f;
+	bool drawingReady = false;
 	bool sectioningReady = false;
+	bool isGridWanted = true;
 	std::vector<std::tuple<double, double, bool>> data;
 
 	Histogram3D() {}

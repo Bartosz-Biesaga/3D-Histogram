@@ -177,4 +177,5 @@ void Histogram3D::prepareForDrawing() {
             falseBins[i][j].drawTopFace = true;
         }
     }
+    drawingReady = true;
 }
