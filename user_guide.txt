@@ -11,6 +11,7 @@
 * GUI enabling/disabling:
   - press <left control> + <H> to enable/disable user guide,
   - press <left control> + <L> to enable/disable data loading GUI,
+  - press <left control> + <M> to enable/disable histogram modification GUI
 
 * Misc:
   - press <left control> + <S> to save a screenshot.

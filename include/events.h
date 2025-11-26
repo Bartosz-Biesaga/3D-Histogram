@@ -13,4 +13,5 @@ namespace Events {
 	bool loadHistogramData(char* delimiter, char* column1, char* column2, char* boolColumn,
 		bool skipFirstRow, bool convertToInt, int* binsNumber);
 
+	void updateGridSquaresNumbers(int *gridSquaresNumbers);
 }
