@@ -177,6 +177,10 @@ void Histogram3D::prepareForDrawing() {
             falseBins[i][j].drawTopFace = true;
         }
     }
+    drawingLimitsColumn1[0] = 0;
+    drawingLimitsColumn1[1] = trueBins.size();
+    drawingLimitsColumn2[0] = 0;
+    drawingLimitsColumn2[1] = trueBins.front().size();
     drawingReady = true;
 }
 

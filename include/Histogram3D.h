@@ -16,6 +16,8 @@ struct Histogram3D {
 	int highestValuesCount = 0;
 	float gridBinsStep[2];
 	float gridHeightStep = (maxHeight - minHeight) / 10.f;
+	int drawingLimitsColumn1[2];
+	int drawingLimitsColumn2[2];
 	bool drawingReady = false;
 	bool sectioningReady = false;
 	bool isGridWanted = true;

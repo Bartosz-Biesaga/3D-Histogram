@@ -110,6 +110,9 @@ namespace Drawing {
                 if (ImGui::Button("Rebin histogram")) {
                     Events::rebinHistogram(newBinsNumbers);
                 }
+                ImGui::Separator();
+                ImGui::SliderInt2("Histogram sectioning\n(x variable)", histogram3D.drawingLimitsColumn1, 0, histogram3D.trueBins.size());
+				ImGui::SliderInt2("Histogram sectioning\n(y variable)", histogram3D.drawingLimitsColumn2, 0, histogram3D.trueBins.front().size());
             ImGui::EndDisabled();
         ImGui::End();
     }
@@ -164,8 +167,8 @@ namespace Drawing {
     }
 
     void drawHistogram() {
-        for (int i = 0; i < histogram3D.trueBins.size(); ++i) {
-            for (int j = 0; j < histogram3D.trueBins[i].size(); ++j) {
+        for (int i = histogram3D.drawingLimitsColumn1[0]; i < histogram3D.drawingLimitsColumn1[1]; ++i) {
+            for (int j = histogram3D.drawingLimitsColumn2[0]; j < histogram3D.drawingLimitsColumn2[1]; ++j) {
                 if (histogram3D.trueBins[i][j].valuesCount != 0) {
                     drawBar(histogram3D.trueBins[i][j].leftBottomNearPoint,
                         histogram3D.trueBins[i][j].rightTopFarPoint,
