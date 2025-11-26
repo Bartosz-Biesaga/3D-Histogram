@@ -86,17 +86,30 @@ namespace Drawing {
 
     void drawHistogramInputsWindow() {
         static int gridSquaresNumbers[3]{10, 10, 10};
-        char const* windowTitle = "Modify histogram";
-        if (!Drawing::histogram3D.drawingReady) {
-            windowTitle = "Modify histogram (unavailable until data is loaded)";
-        }
-        ImGui::Begin(windowTitle);
+        static int newBinsNumbers[2]{};
+        ImGui::Begin("Modify histogram");
+            if (!Drawing::histogram3D.drawingReady) {
+                ImGui::Text("Unavailable until data is loaded.");
+            }
             ImGui::BeginDisabled(!Drawing::histogram3D.drawingReady);
                 ImGui::PushItemWidth(150);
                 if (ImGui::InputInt3("Number of grid's squares for \nx/y variable and height", gridSquaresNumbers)) {
                     Events::updateGridSquaresNumbers(gridSquaresNumbers);
                 }
 				ImGui::Checkbox("Show grid", &Drawing::histogram3D.isGridWanted);
+            ImGui::EndDisabled();
+            ImGui::Separator();
+            if (!Drawing::histogram3D.drawingReady) {
+                ImGui::Text("Unavailable until data is loaded.");
+            }
+            else if (!Drawing::histogram3D.sectioningReady) {
+                ImGui::Text("Unavailable. Data is still being sorted.");
+            }
+            ImGui::BeginDisabled(!Drawing::histogram3D.drawingReady);
+                ImGui::InputInt2("New bins number for\nx/y variable", newBinsNumbers);
+                if (ImGui::Button("Rebin histogram")) {
+                    Events::rebinHistogram(newBinsNumbers);
+                }
             ImGui::EndDisabled();
         ImGui::End();
     }

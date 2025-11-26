@@ -23,10 +23,10 @@ namespace Events {
             Drawing::camera.phi = 0.0f;
         }
         if (Drawing::camera.theta > 2.f * std::numbers::pi) {
-            Drawing::camera.theta -= 2.f * std::numbers::pi;
+            Drawing::camera.theta -= 2.f * static_cast<float>(std::numbers::pi);
         }
         if (Drawing::camera.theta < 0) {
-            Drawing::camera.theta += 2.f * std::numbers::pi;
+            Drawing::camera.theta += 2.f * static_cast<float>(std::numbers::pi);
         }
         mouseLastPosition.x = event.mouseMove.x;
 		mouseLastPosition.y = event.mouseMove.y;
@@ -200,5 +200,9 @@ namespace Events {
             Drawing::histogram3D.gridBinsStep[1] = Drawing::histogram3D.trueBins.front().size() / static_cast<float>(gridSquaresNumbers[1]);
             Drawing::histogram3D.gridHeightStep = (Histogram3D::maxHeight - Histogram3D::minHeight) / static_cast<float>(gridSquaresNumbers[2]);
         }
+    }
+
+    void rebinHistogram(int* newBinsNumbers) {
+
     }
 }
