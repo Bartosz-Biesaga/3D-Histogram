@@ -196,13 +196,15 @@ namespace Events {
             }
         }
         if (modifyGridSquaresNumber) {
-            Drawing::histogram3D.gridBinsStep[0] = Drawing::histogram3D.trueBins.size() / static_cast<float>(gridSquaresNumbers[0]);
-            Drawing::histogram3D.gridBinsStep[1] = Drawing::histogram3D.trueBins.front().size() / static_cast<float>(gridSquaresNumbers[1]);
-            Drawing::histogram3D.gridHeightStep = (Histogram3D::maxHeight - Histogram3D::minHeight) / static_cast<float>(gridSquaresNumbers[2]);
+            Drawing::histogram3D.updateGridSteps(gridSquaresNumbers);
         }
     }
 
     void rebinHistogram(int* newBinsNumbers) {
-
+        if (newBinsNumbers[0] <= 1 || newBinsNumbers[1] <= 1) {
+            tinyfd_messageBox("Error", "Bins number must be greater than 1", "ok", "error", 1);
+            return;
+        }
+		Drawing::histogram3D.rebin(newBinsNumbers[0], newBinsNumbers[1]);
     }
 }

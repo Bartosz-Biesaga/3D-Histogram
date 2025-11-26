@@ -86,7 +86,7 @@ namespace Drawing {
 
     void drawHistogramInputsWindow() {
         static int gridSquaresNumbers[3]{10, 10, 10};
-        static int newBinsNumbers[2]{};
+        static int newBinsNumbers[2]{10, 10};
         ImGui::Begin("Modify histogram");
             if (!Drawing::histogram3D.drawingReady) {
                 ImGui::Text("Unavailable until data is loaded.");

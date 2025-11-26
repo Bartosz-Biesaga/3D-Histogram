@@ -179,3 +179,58 @@ void Histogram3D::prepareForDrawing() {
     }
     drawingReady = true;
 }
+
+void Histogram3D::rebin(int newBinsNumberAlongColumn1, int newBinsNumberAlongColumn2) {
+	const double minValue1 = trueBins.front().front().minColumn1;
+	const double maxValue1 = trueBins.back().back().maxColumn1;
+	const double minValue2 = trueBins.front().front().minColumn2;
+	const double maxValue2 = trueBins.back().back().maxColumn2;
+    std::vector<std::vector<Bin2D>> newTrueBins(newBinsNumberAlongColumn1);
+    std::vector<std::vector<Bin2D>> newFalseBins(newBinsNumberAlongColumn1);
+	for (int i = 0; i < newBinsNumberAlongColumn1; ++i) {
+        newTrueBins[i].resize(newBinsNumberAlongColumn2);
+        newFalseBins[i].resize(newBinsNumberAlongColumn2);
+        for (int j = 0; j < newBinsNumberAlongColumn2; ++j) {
+            double leftEdgeColumn1 = minValue1 + (maxValue1 - minValue1) / newBinsNumberAlongColumn1 * i;
+            double rightEdgeColumn1 = minValue1 + (maxValue1 - minValue1) / newBinsNumberAlongColumn1 * (i + 1);
+            double leftEdgeColumn2 = minValue2 + (maxValue2 - minValue2) / newBinsNumberAlongColumn2 * j;
+            double rightEdgeColumn2 = minValue2 + (maxValue2 - minValue2) / newBinsNumberAlongColumn2 * (j + 1);
+            newTrueBins[i][j] = Bin2D(leftEdgeColumn1, rightEdgeColumn1, leftEdgeColumn2, rightEdgeColumn2);
+            newFalseBins[i][j] = Bin2D(leftEdgeColumn1, rightEdgeColumn1, leftEdgeColumn2, rightEdgeColumn2);
+        }
+    }
+	for (int i = 0; i < trueBins.size(); ++i) {
+        for (int j = 0; j < trueBins[i].size(); ++j) {
+            for (auto const& [value1, value2] : trueBins[i][j].sortedValues) {
+                int binIndex1 = std::clamp(static_cast<int>((value1 - minValue1) / (maxValue1 - minValue1) * newBinsNumberAlongColumn1), 0, newBinsNumberAlongColumn1 - 1);
+                int binIndex2 = std::clamp(static_cast<int>((value2 - minValue2) / (maxValue2 - minValue2) * newBinsNumberAlongColumn2), 0, newBinsNumberAlongColumn2 - 1);
+                newTrueBins[binIndex1][binIndex2].sortedValues.emplace_back(value1, value2);
+            }
+			for (auto const& [value1, value2] : falseBins[i][j].sortedValues) {
+                int binIndex1 = std::clamp(static_cast<int>((value1 - minValue1) / (maxValue1 - minValue1) * newBinsNumberAlongColumn1), 0, newBinsNumberAlongColumn1 - 1);
+                int binIndex2 = std::clamp(static_cast<int>((value2 - minValue2) / (maxValue2 - minValue2) * newBinsNumberAlongColumn2), 0, newBinsNumberAlongColumn2 - 1);
+                newFalseBins[binIndex1][binIndex2].sortedValues.emplace_back(value1, value2);
+            }
+        }
+    }
+	for (int i = 0; i < newBinsNumberAlongColumn1; ++i) {
+        for (int j = 0; j < newBinsNumberAlongColumn2; ++j) {
+            newTrueBins[i][j].valuesCount = static_cast<int>(newTrueBins[i][j].sortedValues.size());
+            newFalseBins[i][j].valuesCount = static_cast<int>(newFalseBins[i][j].sortedValues.size());
+        }
+    }
+    int gridSquaresNumbers[] = { static_cast<int>(round(trueBins.size() / gridBinsStep[0])),
+                                 static_cast<int>(round(trueBins.front().size() / gridBinsStep[1])),
+                                 static_cast<int>(round((maxHeight - minHeight) / gridHeightStep)) };
+	trueBins = std::move(newTrueBins);
+	falseBins = std::move(newFalseBins);
+    highestValuesCount = 0;
+	prepareForDrawing();
+    updateGridSteps(gridSquaresNumbers);
+}
+
+void Histogram3D::updateGridSteps(int* gridSquaresNumbers) {
+    gridBinsStep[0] = trueBins.size() / static_cast<float>(gridSquaresNumbers[0]);
+    gridBinsStep[1] = trueBins.front().size() / static_cast<float>(gridSquaresNumbers[1]);
+    gridHeightStep = (maxHeight - minHeight) / static_cast<float>(gridSquaresNumbers[2]);
+}
