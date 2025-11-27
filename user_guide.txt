@@ -23,5 +23,5 @@
   - bool column is used to mark proportion of data samples with true label to 
     all data in given bin using red bar color
   - in bool column "true", "True" and "1" are the only values considered true
-  - lines must end with newline,
+  - row of data must end with newline character,
   - cells' contents are trimmed from whitespaces.

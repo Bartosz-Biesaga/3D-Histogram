@@ -79,6 +79,9 @@ int main() {
         if (Drawing::drawHistogramInputs) {
             Drawing::drawHistogramInputsWindow();
         }
+        if (Drawing::histogram3D.drawingReady && Drawing::histogram3D.isGridWanted) {
+            Drawing::drawGridTicksValues();
+        }
         ImGui::SFML::Render(window);
         window.display();
     }
