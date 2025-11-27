@@ -66,10 +66,6 @@ int main() {
 		
         Drawing::drawScene();
         ImGui::SFML::Update(window, deltaClock.restart());
-        if (willSaveScreen) {
-            Events::saveScreen(window);
-            willSaveScreen = false;
-        }
         if (Drawing::drawLoadDataInputs) {
             Drawing::drawFileLoadUserInputs();
         }
@@ -83,6 +79,10 @@ int main() {
             Drawing::drawGridTicksValues();
         }
         ImGui::SFML::Render(window);
+        if (willSaveScreen) {
+            Events::saveScreen(window);
+            willSaveScreen = false;
+        }
         window.display();
     }
     ImGui::SFML::Shutdown();
