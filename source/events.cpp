@@ -44,8 +44,8 @@ namespace Events {
         if (Drawing::camera.distance < 0.1f) {
             Drawing::camera.distance = 0.1f;
         }
-        else if (Drawing::camera.distance > 10.0f) {
-            Drawing::camera.distance = 10.0f;
+        else if (Drawing::camera.distance > 5.0f) {
+            Drawing::camera.distance = 5.0f;
         }
         if (Drawing::perspectiveProjection == false) {
             Drawing::reshapeScreen(window.getSize());
