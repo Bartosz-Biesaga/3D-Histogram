@@ -5,8 +5,9 @@
   - press <P> to switch between perspective/orthogonal projection.
 
 * How to position histogram:
-  - use <left>/<right>, <up>/<down> arrow keys and <Q>/<E> to translate the histogram.
+  - use <left>/<right>, <up>/<down> arrow keys and <PageDown>/<PageUp> to translate the histogram.
   - additionally hold <left alt> or <left control> for finer control
+  - to restore initial histogram position press <left control> + <R>
 
 * GUI enabling/disabling:
   - press <left control> + <H> to enable/disable user guide,

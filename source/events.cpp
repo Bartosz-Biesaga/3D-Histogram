@@ -96,6 +96,9 @@ namespace Events {
                 Drawing::scenePosition.y = -1.f;
             }
         }
+        if (event.key.code == sf::Keyboard::R && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+            Drawing::scenePosition = { 0.0f, 0.0f, 0.0f };
+        }
     }
 
     void saveScreen(sf::RenderWindow const& window) {
