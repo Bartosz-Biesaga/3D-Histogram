@@ -143,34 +143,43 @@ namespace Drawing {
     }
 
     void drawDummyScene() {
-        //uklad
+        constexpr float axes_length = 1.f;
+        constexpr float cube_size = 0.5f;
         glBegin(GL_LINES);
-        glColor3f(1.0, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(1.0, 0, 0);
-        glColor3f(0.0, 1.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, 1.0, 0);
-        glColor3f(0.0, 0.0, 1.0); glVertex3f(0, 0, 0); glVertex3f(0, 0, 1.0);
+            glColor3f(axes_length, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(axes_length, 0, 0);
+            glColor3f(0.0, axes_length, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, axes_length, 0);
+            glColor3f(0.0, 0.0, axes_length); glVertex3f(0, 0, 0); glVertex3f(0, 0, axes_length);
         glEnd();
-
-        //Linie przerywane
         glEnable(GL_LINE_STIPPLE);
         glLineStipple(2, 0xAAAA);
         glBegin(GL_LINES);
-        glColor3f(1.0, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(-1.0, 0, 0);
-        glColor3f(0.0, 1.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, -1.0, 0);
-        glColor3f(0.0, 0.0, 1.0); glVertex3f(0, 0, 0); glVertex3f(0, 0, -1.0);
+            glColor3f(axes_length, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(-axes_length, 0, 0);
+            glColor3f(0.0, axes_length, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, -axes_length, 0);
+            glColor3f(0.0, 0.0, axes_length); glVertex3f(0, 0, 0); glVertex3f(0, 0, -axes_length);
         glEnd();
         glDisable(GL_LINE_STIPPLE);
-
-        //szescian
-        glLineWidth(2.0);
-        glColor3f(0, 0, 0);
         glBegin(GL_LINES);
-        for (unsigned char i = 0; i < 2; i++) {
-            for (unsigned char j = 0; j < 2; j++) {
-                glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j, -0.3f); glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j, 0.3f);
-                glVertex3f(-0.3f, -0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j); glVertex3f(0.3f, -0.3f + 0.6f * (i ^ j), -0.3f + 0.6f * j);
-                glVertex3f(-0.3f + 0.6f * (i ^ j), -0.3f, -0.3f + 0.6f * j); glVertex3f(-0.3f + 0.6f * (i ^ j), 0.3f, -0.3f + 0.6f * j);
-            }
-        }
+            glColor3f(0.0, 0.0, 0.0);
+            glVertex3f(-cube_size, -cube_size, -cube_size); glVertex3f(-cube_size, -cube_size, cube_size);
+            glVertex3f(-cube_size, -cube_size, -cube_size); glVertex3f(-cube_size, cube_size, -cube_size);
+            glVertex3f(-cube_size, -cube_size, -cube_size); glVertex3f(cube_size, -cube_size, -cube_size);
+            glVertex3f(cube_size, cube_size, cube_size); glVertex3f(cube_size, cube_size, -cube_size);
+            glVertex3f(cube_size, cube_size, cube_size); glVertex3f(cube_size, -cube_size, cube_size);
+            glVertex3f(cube_size, cube_size, cube_size); glVertex3f(-cube_size, cube_size, cube_size);
+            glVertex3f(cube_size, cube_size, -cube_size); glVertex3f(cube_size, -cube_size, -cube_size);
+            glVertex3f(cube_size, cube_size, -cube_size); glVertex3f(-cube_size, cube_size, -cube_size);
+            glVertex3f(-cube_size, -cube_size, cube_size); glVertex3f(cube_size, -cube_size, cube_size);
+            glVertex3f(-cube_size, -cube_size, cube_size); glVertex3f(-cube_size, cube_size, cube_size);
+            glVertex3f(cube_size, -cube_size, -cube_size); glVertex3f(cube_size, -cube_size, cube_size);
+            glVertex3f(-cube_size, cube_size, -cube_size); glVertex3f(-cube_size, cube_size, cube_size);
+        glEnd();
+        glBegin(GL_TRIANGLES);
+            glColor3f(1.0, 0.0, 0.0);
+            glVertex3f(-cube_size, -cube_size, -cube_size);
+            glColor3f(0.0, 1.0, 0.0);
+            glVertex3f(-cube_size, cube_size, cube_size);
+            glColor3f(0.0, 0.0, 1.0);
+            glVertex3f(cube_size, cube_size, -cube_size);
         glEnd();
     }
 
