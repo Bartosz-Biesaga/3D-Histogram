@@ -84,13 +84,13 @@ namespace Events {
                 Drawing::scenePosition.z = 2.f;
             }
 		}
-        if (event.key.code == sf::Keyboard::E) {
+        if (event.key.code == sf::Keyboard::PageUp) {
             Drawing::scenePosition.y += step;
             if (Drawing::scenePosition.y > 1.f) {
                 Drawing::scenePosition.y = 1.f;
 			}
         }
-		if (event.key.code == sf::Keyboard::Q) {
+		if (event.key.code == sf::Keyboard::PageDown) {
             Drawing::scenePosition.y -= step;
             if (Drawing::scenePosition.y < -1.f) {
                 Drawing::scenePosition.y = -1.f;
