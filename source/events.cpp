@@ -23,10 +23,10 @@ namespace Events {
             Drawing::camera.phi = 0.0f;
         }
         if (Drawing::camera.theta > 2.f * std::numbers::pi) {
-            Drawing::camera.theta -= 2.f * std::numbers::pi;
+            Drawing::camera.theta -= 2.f * static_cast<float>(std::numbers::pi);
         }
         if (Drawing::camera.theta < 0) {
-            Drawing::camera.theta += 2.f * std::numbers::pi;
+            Drawing::camera.theta += 2.f * static_cast<float>(std::numbers::pi);
         }
         mouseLastPosition.x = event.mouseMove.x;
 		mouseLastPosition.y = event.mouseMove.y;
@@ -44,8 +44,8 @@ namespace Events {
         if (Drawing::camera.distance < 0.1f) {
             Drawing::camera.distance = 0.1f;
         }
-        else if (Drawing::camera.distance > 10.0f) {
-            Drawing::camera.distance = 10.0f;
+        else if (Drawing::camera.distance > 5.0f) {
+            Drawing::camera.distance = 5.0f;
         }
         if (Drawing::perspectiveProjection == false) {
             Drawing::reshapeScreen(window.getSize());
@@ -84,17 +84,20 @@ namespace Events {
                 Drawing::scenePosition.z = 2.f;
             }
 		}
-        if (event.key.code == sf::Keyboard::E) {
+        if (event.key.code == sf::Keyboard::PageUp) {
             Drawing::scenePosition.y += step;
             if (Drawing::scenePosition.y > 1.f) {
                 Drawing::scenePosition.y = 1.f;
 			}
         }
-		if (event.key.code == sf::Keyboard::Q) {
+		if (event.key.code == sf::Keyboard::PageDown) {
             Drawing::scenePosition.y -= step;
             if (Drawing::scenePosition.y < -1.f) {
                 Drawing::scenePosition.y = -1.f;
             }
+        }
+        if (event.key.code == sf::Keyboard::R && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) {
+            Drawing::scenePosition = { 0.0f, 0.0f, 0.0f };
         }
     }
 
@@ -196,9 +199,15 @@ namespace Events {
             }
         }
         if (modifyGridSquaresNumber) {
-            Drawing::histogram3D.gridBinsStep[0] = Drawing::histogram3D.trueBins.size() / static_cast<float>(gridSquaresNumbers[0]);
-            Drawing::histogram3D.gridBinsStep[1] = Drawing::histogram3D.trueBins.front().size() / static_cast<float>(gridSquaresNumbers[1]);
-            Drawing::histogram3D.gridHeightStep = (Histogram3D::maxHeight - Histogram3D::minHeight) / static_cast<float>(gridSquaresNumbers[2]);
+            Drawing::histogram3D.updateGridSteps(gridSquaresNumbers);
         }
+    }
+
+    void rebinHistogram(int* newBinsNumbers) {
+        if (newBinsNumbers[0] <= 1 || newBinsNumbers[1] <= 1) {
+            tinyfd_messageBox("Error", "Bins number must be greater than 1", "ok", "error", 1);
+            return;
+        }
+		Drawing::histogram3D.rebin(newBinsNumbers[0], newBinsNumbers[1]);
     }
 }

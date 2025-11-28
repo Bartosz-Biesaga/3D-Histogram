@@ -14,4 +14,6 @@ namespace Events {
 		bool skipFirstRow, bool convertToInt, int* binsNumber);
 
 	void updateGridSquaresNumbers(int *gridSquaresNumbers);
+
+	void rebinHistogram(int* newBinsNumbers);
 }

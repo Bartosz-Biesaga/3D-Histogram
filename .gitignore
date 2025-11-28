@@ -18,6 +18,7 @@ tinyfiledialogs.*
 imgui/*
 *.ini
 data/*
+fonts/*
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

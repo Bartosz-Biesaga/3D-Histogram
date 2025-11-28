@@ -13,6 +13,9 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(1280, 720), "3D Histogram", 7U, context);
     sf::Clock deltaClock;
     ImGui::SFML::Init(window);
+    ImGui::GetIO().Fonts->AddFontDefault();
+    Drawing::bigFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 96.0f);
+    ImGui::SFML::UpdateFontTexture();
     sfe event;
     window.setVerticalSyncEnabled(true);
     Drawing::reshapeScreen(window.getSize());
@@ -66,10 +69,6 @@ int main() {
 		
         Drawing::drawScene();
         ImGui::SFML::Update(window, deltaClock.restart());
-        if (willSaveScreen) {
-            Events::saveScreen(window);
-            willSaveScreen = false;
-        }
         if (Drawing::drawLoadDataInputs) {
             Drawing::drawFileLoadUserInputs();
         }
@@ -79,7 +78,14 @@ int main() {
         if (Drawing::drawHistogramInputs) {
             Drawing::drawHistogramInputsWindow();
         }
+        if (Drawing::histogram3D.drawingReady && Drawing::histogram3D.isGridWanted) {
+            Drawing::drawGridTicksValues();
+        }
         ImGui::SFML::Render(window);
+        if (willSaveScreen) {
+            Events::saveScreen(window);
+            willSaveScreen = false;
+        }
         window.display();
     }
     ImGui::SFML::Shutdown();
