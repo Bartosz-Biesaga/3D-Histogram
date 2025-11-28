@@ -18,6 +18,7 @@ struct Histogram3D {
 	float gridHeightStep = (maxHeight - minHeight) / 10.f;
 	int drawingLimitsColumn1[2];
 	int drawingLimitsColumn2[2];
+	char gridLabels[3][128] = { "x", "y", "count" };
 	bool drawingReady = false;
 	bool sectioningReady = false;
 	bool isGridWanted = true;

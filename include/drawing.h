@@ -11,6 +11,7 @@ namespace Drawing {
 	extern bool drawUserGuide;
 	extern bool drawHistogramInputs;
 	extern Histogram3D histogram3D;
+	extern ImFont* bigFont;
 
 	struct ScreenPoint {
 		sf::Vector2f position;
@@ -40,4 +41,8 @@ namespace Drawing {
 	ScreenPoint mapWorldCoordinatesToScreen(sf::Vector3f worldPoint, GLdouble* modelMatrix, GLdouble* projectionMatrix, GLint* viewport);
 
 	void drawGridTicksValues();
+
+	void drawGridTickValue(ImDrawList* drawList, double value, sf::Vector3f worldPoint, GLdouble* modelMatrix, GLdouble* projectionMatrix, GLint* viewport);
+
+	void drawGridLabel(ImDrawList* drawList, const char* label, ScreenPoint screenPoint, float angleRadians);
 }

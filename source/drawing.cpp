@@ -10,6 +10,7 @@ namespace Drawing {
     bool drawUserGuide = true;
     bool drawHistogramInputs = false;
     Histogram3D histogram3D;
+    ImFont* bigFont = nullptr;
     void (*drawingFunction)() = &drawDummyScene;
 
     void initOpenGL() {
@@ -87,33 +88,40 @@ namespace Drawing {
     void drawHistogramInputsWindow() {
         static int gridSquaresNumbers[3]{ 10, 10, 10 };
         static int newBinsNumbers[2]{ 10, 10 };
+        int sectioningUpperLimitColumn2 = 0;
+        if (histogram3D.drawingReady) {
+            sectioningUpperLimitColumn2 = histogram3D.trueBins.front().size();
+        }
         ImGui::Begin("Modify histogram");
-        if (!Drawing::histogram3D.drawingReady) {
-            ImGui::Text("Unavailable until data is loaded.");
-        }
-        ImGui::BeginDisabled(!Drawing::histogram3D.drawingReady);
-        ImGui::PushItemWidth(150);
-        if (ImGui::InputInt3("Number of grid's squares for \nx/y variable and height", gridSquaresNumbers)) {
-            Events::updateGridSquaresNumbers(gridSquaresNumbers);
-        }
-        ImGui::Checkbox("Show grid", &Drawing::histogram3D.isGridWanted);
-        ImGui::EndDisabled();
-        ImGui::Separator();
-        if (!Drawing::histogram3D.drawingReady) {
-            ImGui::Text("Unavailable until data is loaded.");
-        }
-        else if (!Drawing::histogram3D.sectioningReady) {
-            ImGui::Text("Unavailable. Data is still being sorted.");
-        }
-        ImGui::BeginDisabled(!Drawing::histogram3D.drawingReady);
-        ImGui::InputInt2("New bins number for\nx/y variable", newBinsNumbers);
-        if (ImGui::Button("Rebin histogram")) {
-            Events::rebinHistogram(newBinsNumbers);
-        }
-        ImGui::Separator();
-        ImGui::SliderInt2("Histogram sectioning\n(x variable)", histogram3D.drawingLimitsColumn1, 0, histogram3D.trueBins.size());
-        ImGui::SliderInt2("Histogram sectioning\n(y variable)", histogram3D.drawingLimitsColumn2, 0, histogram3D.trueBins.front().size());
-        ImGui::EndDisabled();
+            if (!histogram3D.drawingReady) {
+                ImGui::Text("Unavailable until data is loaded.");
+            }
+            ImGui::BeginDisabled(!histogram3D.drawingReady);
+                ImGui::PushItemWidth(150);
+                if (ImGui::InputInt3("Number of grid's squares for \nx/y variable and height", gridSquaresNumbers)) {
+                    Events::updateGridSquaresNumbers(gridSquaresNumbers);
+                }
+                ImGui::PushItemWidth(250);
+                ImGui::InputText("x label", histogram3D.gridLabels[0], 128);
+                ImGui::InputText("y label", histogram3D.gridLabels[1], 128);
+                ImGui::Checkbox("Show grid", &histogram3D.isGridWanted);
+            ImGui::EndDisabled();
+            ImGui::Separator();
+            if (!histogram3D.drawingReady) {
+                ImGui::Text("Unavailable until data is loaded.");
+            }
+            else if (!histogram3D.sectioningReady) {
+                ImGui::Text("Unavailable. Data is still being sorted.");
+            }
+            ImGui::BeginDisabled(!histogram3D.drawingReady);
+                ImGui::InputInt2("New bins number for\nx/y variable", newBinsNumbers);
+                if (ImGui::Button("Rebin histogram")) {
+                    Events::rebinHistogram(newBinsNumbers);
+                }
+                ImGui::Separator();
+                ImGui::SliderInt2("Histogram sectioning\n(x variable)", histogram3D.drawingLimitsColumn1, 0, histogram3D.trueBins.size());
+                ImGui::SliderInt2("Histogram sectioning\n(y variable)", histogram3D.drawingLimitsColumn2, 0, sectioningUpperLimitColumn2);
+            ImGui::EndDisabled();
         ImGui::End();
     }
 
@@ -344,41 +352,85 @@ namespace Drawing {
         float const xForZTicks = needToFlipZ ? Histogram3D::xLow - margin - ticksMargin : Histogram3D::xHigh + margin + ticksMargin;
         float const xForYTicks = needToFlipX ? Histogram3D::xHigh + margin + ticksMargin : Histogram3D::xLow - margin - ticksMargin;
         float const zForYTicks = needToFlipZ ? Histogram3D::zLow - margin - ticksMargin : Histogram3D::zHigh + margin + ticksMargin;
+		float const zForXTicksLabel = needToFlipX ? Histogram3D::zLow - margin - ticksMargin * 2 : Histogram3D::zHigh + margin + ticksMargin * 2;
+		float const xForZTicksLabel = needToFlipZ ? Histogram3D::xLow - margin - ticksMargin * 2 : Histogram3D::xHigh + margin + ticksMargin * 2;
+		float const xForYTicksLabel = needToFlipX ? Histogram3D::xHigh + margin + ticksMargin * 3 : Histogram3D::xLow - margin - ticksMargin * 3;
+		float const zForYTicksLabel = needToFlipZ ? Histogram3D::zLow - margin - ticksMargin * 3 : Histogram3D::zHigh + margin + ticksMargin * 3;
         for (float x = Histogram3D::xLow;
                 x <= Histogram3D::xHigh + eps;
                 x += xTicksStep) {
-            ScreenPoint screenPoint = mapWorldCoordinatesToScreen({ x, Histogram3D::minHeight - 0.2f, zForXTicks }, modelMatrix, projectionMatrix, viewport);
-            if (screenPoint.isInFrontOfCamera) {
-                double const value = (x - Histogram3D::xLow) / (Histogram3D::xHigh - Histogram3D::xLow) * (histogram3D.trueBins.back().back().maxColumn1 - histogram3D.trueBins.front().front().minColumn1);
-                std::string label = std::format("{:.2}", value);
-                ImVec2 textSize = ImGui::CalcTextSize(label.c_str());
-                ImVec2 textPos = ImVec2(screenPoint.position.x - textSize.x * 0.5f, screenPoint.position.y);
-                drawList->AddText(textPos, IM_COL32(0, 0, 0, 255), label.c_str());
-            }
+            double const value = (x - Histogram3D::xLow) / (Histogram3D::xHigh - Histogram3D::xLow) *
+                (histogram3D.trueBins.back().back().maxColumn1 - histogram3D.trueBins.front().front().minColumn1);
+            drawGridTickValue(drawList, value, { x, Histogram3D::minHeight - 0.2f, zForXTicks }, modelMatrix, projectionMatrix, viewport);
         }
         for (float z = Histogram3D::zLow;
                 z <= Histogram3D::zHigh + eps;
                 z += zTicksStep) {
-            ScreenPoint screenPoint = mapWorldCoordinatesToScreen({ xForZTicks, Histogram3D::minHeight - 0.2f, z }, modelMatrix, projectionMatrix, viewport);
-            if (screenPoint.isInFrontOfCamera) {
-                double const value = (z - Histogram3D::zLow) / (Histogram3D::zHigh - Histogram3D::zLow) * (histogram3D.trueBins.back().back().maxColumn2 - histogram3D.trueBins.front().front().minColumn2);
-                std::string label = std::format("{:.2}", value);
-                ImVec2 textSize = ImGui::CalcTextSize(label.c_str());
-                ImVec2 textPos = ImVec2(screenPoint.position.x - textSize.x * 0.5f, screenPoint.position.y);
-                drawList->AddText(textPos, IM_COL32(0, 0, 0, 255), label.c_str());
-            }
+            double const value = (z - Histogram3D::zLow) / (Histogram3D::zHigh - Histogram3D::zLow) *
+                (histogram3D.trueBins.back().back().maxColumn2 - histogram3D.trueBins.front().front().minColumn2);
+            drawGridTickValue(drawList, value, { xForZTicks, Histogram3D::minHeight - 0.2f, z }, modelMatrix, projectionMatrix, viewport);
         }
         for (float y = Histogram3D::minHeight;
                 y <= Histogram3D::maxHeight + eps;
                 y += yTicksStep) {
-            ScreenPoint screenPoint = mapWorldCoordinatesToScreen({ xForYTicks, y, zForYTicks }, modelMatrix, projectionMatrix, viewport);
-            if (screenPoint.isInFrontOfCamera) {
-                double const value = (y - Histogram3D::minHeight) / (Histogram3D::maxHeight - Histogram3D::minHeight) * histogram3D.highestValuesCount;
-                std::string label = std::format("{:.3}", value);
-                ImVec2 textSize = ImGui::CalcTextSize(label.c_str());
-                ImVec2 textPos = ImVec2(screenPoint.position.x - textSize.x * 0.5f, screenPoint.position.y);
-                drawList->AddText(textPos, IM_COL32(0, 0, 0, 255), label.c_str());
-            }
+            double const value = (y - Histogram3D::minHeight) / (Histogram3D::maxHeight - Histogram3D::minHeight) * histogram3D.highestValuesCount;
+            drawGridTickValue(drawList, value, { xForYTicks, y, zForYTicks }, modelMatrix, projectionMatrix, viewport);
         }
+        sf::Vector3f xLabelCenterWorldPoint = { Histogram3D::xLow + (Histogram3D::xHigh - Histogram3D::xLow) / 2.f, Histogram3D::minHeight - 0.3f, zForXTicksLabel};
+		sf::Vector3f xLabelCenterTranslatedAlongXWorldPoint = { xLabelCenterWorldPoint.x + 0.1f, xLabelCenterWorldPoint.y, xLabelCenterWorldPoint.z };
+		ScreenPoint xLabelCenterScreenPoint = mapWorldCoordinatesToScreen(xLabelCenterWorldPoint, modelMatrix, projectionMatrix, viewport);
+		ScreenPoint xLabelCenterTranslatedAlongXScreenPoint = mapWorldCoordinatesToScreen(xLabelCenterTranslatedAlongXWorldPoint, modelMatrix, projectionMatrix, viewport);
+        float xLabelAngle = std::atan2f(xLabelCenterTranslatedAlongXScreenPoint.position.y - xLabelCenterScreenPoint.position.y,
+            xLabelCenterTranslatedAlongXScreenPoint.position.x - xLabelCenterScreenPoint.position.x);
+        if(needToFlipX) {
+            xLabelAngle += std::numbers::pi;
+		}
+        drawGridLabel(drawList, histogram3D.gridLabels[0], xLabelCenterScreenPoint, xLabelAngle);
+		sf::Vector3f zLabelCenterWorldPoint = { xForZTicksLabel, Histogram3D::minHeight - 0.3f, Histogram3D::zLow + (Histogram3D::zHigh - Histogram3D::zLow) / 2.f };
+		sf::Vector3f zLabelCenterTranslatedAlongZWorldPoint = { zLabelCenterWorldPoint.x, zLabelCenterWorldPoint.y, zLabelCenterWorldPoint.z + 0.1f };
+		ScreenPoint zLabelCenterScreenPoint = mapWorldCoordinatesToScreen(zLabelCenterWorldPoint, modelMatrix, projectionMatrix, viewport);
+        ScreenPoint zLabelCenterTranslatedAlongZScreenPoint = mapWorldCoordinatesToScreen(zLabelCenterTranslatedAlongZWorldPoint, modelMatrix, projectionMatrix, viewport);
+        float zLabelAngle = std::atan2f(zLabelCenterTranslatedAlongZScreenPoint.position.y - zLabelCenterScreenPoint.position.y,
+            zLabelCenterTranslatedAlongZScreenPoint.position.x - zLabelCenterScreenPoint.position.x);
+        if(!needToFlipZ) {
+			zLabelAngle += std::numbers::pi;
+            }
+        drawGridLabel(drawList, histogram3D.gridLabels[1], zLabelCenterScreenPoint, zLabelAngle);
+		sf::Vector3f yLabelCenterWorldPoint = { xForYTicksLabel, Histogram3D::minHeight + (Histogram3D::maxHeight - Histogram3D::minHeight) / 2.f, zForYTicksLabel };
+        ScreenPoint yLabelCenterScreenPoint = mapWorldCoordinatesToScreen(yLabelCenterWorldPoint, modelMatrix, projectionMatrix, viewport);
+        drawGridLabel(drawList, histogram3D.gridLabels[2], yLabelCenterScreenPoint, 0);
+    }
+
+    void drawGridTickValue(ImDrawList* drawList, double value, sf::Vector3f worldPoint, GLdouble* modelMatrix, GLdouble* projectionMatrix, GLint* viewport) {
+        ScreenPoint screenPoint = mapWorldCoordinatesToScreen(worldPoint, modelMatrix, projectionMatrix, viewport);
+        if (screenPoint.isInFrontOfCamera) {
+            std::string label = std::format("{:.2}", value);
+            ImVec2 textSize = ImGui::CalcTextSize(label.c_str());
+            ImVec2 textPosition = ImVec2(screenPoint.position.x - textSize.x * 0.5f, screenPoint.position.y);
+            drawList->AddText(textPosition, IM_COL32(0, 0, 0, 255), label.c_str());
+        }
+    }
+
+    void drawGridLabel(ImDrawList* drawList, const char* label, ScreenPoint screenPoint, float angleRadians) {
+		float oldFontSize = ImGui::GetFontSize();
+        ImGui::PushFont(bigFont);
+        float newFontSize = ImGui::GetFontSize();
+        ImVec2 textSize = ImGui::CalcTextSize(label);
+        ImVec2 textPosition = ImVec2(screenPoint.position.x - textSize.x * 0.5f, screenPoint.position.y - textSize.y * 0.5f);
+        int vertexOldLastIndex = drawList->VtxBuffer.Size;
+        drawList->AddText(textPosition, IM_COL32(0, 0, 0, 255), label);
+        int vertexNewLastIndex = drawList->VtxBuffer.Size;
+        float sin = std::sin(angleRadians);
+        float cos = std::cos(angleRadians);
+        for (int i = vertexOldLastIndex; i < vertexNewLastIndex; ++i) {
+            ImDrawVert& vertex = drawList->VtxBuffer[i];
+            float xDelta = vertex.pos.x - screenPoint.position.x;
+            float yDelta = vertex.pos.y - screenPoint.position.y;
+			xDelta *= oldFontSize / newFontSize * 1.25;
+			yDelta *= oldFontSize / newFontSize * 1.25;
+            vertex.pos.x = (xDelta * cos - yDelta * sin) + screenPoint.position.x;
+            vertex.pos.y = (xDelta * sin + yDelta * cos) + screenPoint.position.y;
+        }
+        ImGui::PopFont();
     }
 }

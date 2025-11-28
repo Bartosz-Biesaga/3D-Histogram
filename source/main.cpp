@@ -13,6 +13,9 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(1280, 720), "3D Histogram", 7U, context);
     sf::Clock deltaClock;
     ImGui::SFML::Init(window);
+    ImGui::GetIO().Fonts->AddFontDefault();
+    Drawing::bigFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 96.0f);
+    ImGui::SFML::UpdateFontTexture();
     sfe event;
     window.setVerticalSyncEnabled(true);
     Drawing::reshapeScreen(window.getSize());
