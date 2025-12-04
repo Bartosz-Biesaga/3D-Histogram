@@ -25,5 +25,6 @@
 #include <vector>
 #include <array>
 #include <format>
+#include <functional>
 
 #endif //PCH_H

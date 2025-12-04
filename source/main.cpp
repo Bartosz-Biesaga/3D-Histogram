@@ -12,6 +12,7 @@ int main() {
     sf::ContextSettings context(24, 0, 0, 4, 5);
     sf::RenderWindow window(sf::VideoMode(1280, 720), "3D Histogram", 7U, context);
     sf::Clock deltaClock;
+    sf::Time timeSinceStart = sf::Time::Zero;
     ImGui::SFML::Init(window);
     ImGui::GetIO().Fonts->AddFontDefault();
     Drawing::bigFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 96.0f);
@@ -23,6 +24,14 @@ int main() {
 	sf::Vector2i mouseLastPosition{ 0, 0 };
 	bool mouseLastPositionInitialized = false;
     bool willSaveScreen = false;
+    std::string vertexShaderPath = "shaders/bar.v";
+    std::string fragmentShaderPath = "shaders/bar.f";
+    if (!Drawing::dummySceneShader.loadFromFile(vertexShaderPath, fragmentShaderPath)) {
+        std::string shaderLoadingError("Error loading shaders from:\n - ");
+        shaderLoadingError += vertexShaderPath + "\n - " + fragmentShaderPath;
+        tinyfd_messageBox("Error", shaderLoadingError.c_str(), "ok", "error", 1);
+    }
+    Drawing::drawingFunction = [&window, &timeSinceStart]() {Drawing::drawDummyScene(window, timeSinceStart); };
     while (running) {
         while (window.pollEvent(event)) {
             ImGui::SFML::ProcessEvent(event);
@@ -68,6 +77,7 @@ int main() {
         }
 		
         Drawing::drawScene();
+        timeSinceStart += deltaClock.getElapsedTime();
         ImGui::SFML::Update(window, deltaClock.restart());
         if (Drawing::drawLoadDataInputs) {
             Drawing::drawFileLoadUserInputs();

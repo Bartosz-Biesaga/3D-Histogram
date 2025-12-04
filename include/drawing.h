@@ -12,6 +12,8 @@ namespace Drawing {
 	extern bool drawHistogramInputs;
 	extern Histogram3D histogram3D;
 	extern ImFont* bigFont;
+	extern sf::Shader dummySceneShader;
+	extern std::function<void()> drawingFunction;
 
 	struct ScreenPoint {
 		sf::Vector2f position;
@@ -30,7 +32,7 @@ namespace Drawing {
 
 	void drawHistogramInputsWindow();
 
-	void drawDummyScene();
+	void drawDummyScene(sf::RenderWindow& window, sf::Time& time);
 
 	void drawHistogram();
 
