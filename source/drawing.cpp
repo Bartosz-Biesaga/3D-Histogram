@@ -11,7 +11,8 @@ namespace Drawing {
     bool drawHistogramInputs = false;
     Histogram3D histogram3D;
     ImFont* bigFont = nullptr;
-    void (*drawingFunction)() = &drawDummyScene;
+    std::function<void()> drawingFunction;
+    sf::Shader dummySceneShader;
 
     void initOpenGL() {
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -142,45 +143,41 @@ namespace Drawing {
         ImGui::End();
     }
 
-    void drawDummyScene() {
-        constexpr float axes_length = 1.f;
-        constexpr float cube_size = 0.5f;
-        glBegin(GL_LINES);
-            glColor3f(axes_length, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(axes_length, 0, 0);
-            glColor3f(0.0, axes_length, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, axes_length, 0);
-            glColor3f(0.0, 0.0, axes_length); glVertex3f(0, 0, 0); glVertex3f(0, 0, axes_length);
-        glEnd();
-        glEnable(GL_LINE_STIPPLE);
-        glLineStipple(2, 0xAAAA);
-        glBegin(GL_LINES);
-            glColor3f(axes_length, 0.0, 0.0); glVertex3f(0, 0, 0); glVertex3f(-axes_length, 0, 0);
-            glColor3f(0.0, axes_length, 0.0); glVertex3f(0, 0, 0); glVertex3f(0, -axes_length, 0);
-            glColor3f(0.0, 0.0, axes_length); glVertex3f(0, 0, 0); glVertex3f(0, 0, -axes_length);
-        glEnd();
-        glDisable(GL_LINE_STIPPLE);
-        glBegin(GL_LINES);
-            glColor3f(0.0, 0.0, 0.0);
-            glVertex3f(-cube_size, -cube_size, -cube_size); glVertex3f(-cube_size, -cube_size, cube_size);
-            glVertex3f(-cube_size, -cube_size, -cube_size); glVertex3f(-cube_size, cube_size, -cube_size);
-            glVertex3f(-cube_size, -cube_size, -cube_size); glVertex3f(cube_size, -cube_size, -cube_size);
-            glVertex3f(cube_size, cube_size, cube_size); glVertex3f(cube_size, cube_size, -cube_size);
-            glVertex3f(cube_size, cube_size, cube_size); glVertex3f(cube_size, -cube_size, cube_size);
-            glVertex3f(cube_size, cube_size, cube_size); glVertex3f(-cube_size, cube_size, cube_size);
-            glVertex3f(cube_size, cube_size, -cube_size); glVertex3f(cube_size, -cube_size, -cube_size);
-            glVertex3f(cube_size, cube_size, -cube_size); glVertex3f(-cube_size, cube_size, -cube_size);
-            glVertex3f(-cube_size, -cube_size, cube_size); glVertex3f(cube_size, -cube_size, cube_size);
-            glVertex3f(-cube_size, -cube_size, cube_size); glVertex3f(-cube_size, cube_size, cube_size);
-            glVertex3f(cube_size, -cube_size, -cube_size); glVertex3f(cube_size, -cube_size, cube_size);
-            glVertex3f(-cube_size, cube_size, -cube_size); glVertex3f(-cube_size, cube_size, cube_size);
-        glEnd();
-        glBegin(GL_TRIANGLES);
-            glColor3f(1.0, 0.0, 0.0);
-            glVertex3f(-cube_size, -cube_size, -cube_size);
-            glColor3f(0.0, 1.0, 0.0);
-            glVertex3f(-cube_size, cube_size, cube_size);
-            glColor3f(0.0, 0.0, 1.0);
-            glVertex3f(cube_size, cube_size, -cube_size);
-        glEnd();
+    void drawDummyScene(sf::RenderWindow& window, sf::Time& time) {
+        GLfloat projectionMatrix[16], modelViewMatrix[16], MVP_Matrix[16];
+        glGetFloatv(GL_PROJECTION_MATRIX, projectionMatrix);
+        glGetFloatv(GL_MODELVIEW_MATRIX, modelViewMatrix);
+        for (int row = 0; row < 4; ++row) {
+            for (int col = 0; col < 4; ++col) {
+                float cell = 0.f;
+                for (int k = 0; k < 4; ++k) {
+                    cell += projectionMatrix[k * 4 + col] * modelViewMatrix[row * 4 + k];
+                }
+                MVP_Matrix[row * 4 + col] = cell;
+            }
+        }
+        static std::vector<sf::Vertex> vertices = []() { 
+            int constexpr xStepsNumber = 100;
+            int constexpr zStepsNumber = 100;
+            float constexpr xStep = (Histogram3D::xHigh - Histogram3D::xLow) / xStepsNumber;
+            float constexpr zStep = (Histogram3D::zHigh - Histogram3D::zLow) / zStepsNumber;
+            std::vector<sf::Vertex> vertices;
+            for (int i = 0; i <= xStepsNumber; ++i)
+                vertices.push_back(sf::Vertex{ {Histogram3D::xLow + xStep * i, Histogram3D::zLow + zStep * 0} });
+            for (int j = 1; j <= zStepsNumber; ++j)
+                vertices.push_back(sf::Vertex{ {Histogram3D::xLow + xStep * xStepsNumber, Histogram3D::zLow + zStep * j} });
+            for (int i = xStepsNumber; i >= 0; --i)
+                vertices.push_back(sf::Vertex{ {Histogram3D::xLow + xStep * i, Histogram3D::zLow + zStep * zStepsNumber} });
+            for (int j = zStepsNumber; j >= 0; --j)
+                vertices.push_back(sf::Vertex{ {Histogram3D::xLow + xStep * 0, Histogram3D::zLow + zStep * j} });
+            vertices.push_back(sf::Vertex{ {Histogram3D::xLow + xStep * 0, Histogram3D::zLow + zStep * 0} });
+            return vertices;
+        }();
+        window.pushGLStates();
+        dummySceneShader.setUniform("time", time.asSeconds());
+        dummySceneShader.setUniform("MVP", sf::Glsl::Mat4(MVP_Matrix));
+        window.draw(vertices.data(), vertices.size(), sf::LineStrip, &dummySceneShader);
+        window.popGLStates();
     }
 
     void drawHistogram() {
