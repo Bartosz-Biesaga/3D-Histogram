@@ -17,10 +17,9 @@ void main()
     yPosition *= A;
     gl_Position = MVP * vec4(position.x, yPosition, position.y, 1.);
 
-    vec2 position2 = position;
     vec4 color = vec4(0., 0., 0., 0.);
     for(int i = 0; i < 90; ++i)
-        color += (cos(abs(position.x + 2.)*.5+time+vec4(0,2,4,3))+1.3)/32./abs(position.y + 2.);
+        color += (cos(abs(position.x + 2.) * .5 + time + vec4(0, 2, 4, 3)) + 1.3) / 32. / abs(position.y + 2.);
     color = color / (1.0 + abs(color)) * 0.8;
     color.a = 1.;
     varColor = color;
