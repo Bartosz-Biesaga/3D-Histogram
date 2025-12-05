@@ -157,8 +157,8 @@ namespace Drawing {
             }
         }
         static std::vector<sf::Vertex> vertices = []() { 
-            int constexpr xStepsNumber = 100;
-            int constexpr zStepsNumber = 100;
+            int constexpr xStepsNumber = 250;
+            int constexpr zStepsNumber = 250;
             float constexpr xStep = (Histogram3D::xHigh - Histogram3D::xLow) / xStepsNumber;
             float constexpr zStep = (Histogram3D::zHigh - Histogram3D::zLow) / zStepsNumber;
             std::vector<sf::Vertex> vertices;
